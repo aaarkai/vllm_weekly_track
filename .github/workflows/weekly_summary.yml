@@ -1,0 +1,41 @@
+# .github/workflows/weekly-summary.yml
+name: Generate Weekly Upstream Summary
+
+on:
+  # Run this workflow manually from the Actions tab
+  workflow_dispatch:
+  # Or, run it on a schedule (e.g., every Friday at 23:00 UTC)
+  schedule:
+    - cron: '0 2 * * 5'
+
+jobs:
+  generate-summary:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get date for 7 days ago
+        id: get_date
+        run: echo "PAST_DATE=$(date -d '7 days ago' +%Y-%m-%d)" >> $GITHUB_ENV
+
+      - name: Fetch Merged PRs from Upstream Repo
+        id: fetch_prs
+        env:
+          # This token is required to make API requests
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # !!! CHANGE THIS to the repository you want to track !!!
+          UPSTREAM_REPO: "vllm-project/vllm"
+        run: |
+          prs=$(gh pr list --repo $UPSTREAM_REPO --limit 500 \
+            --search "is:pr is:merged merged:>${{ env.PAST_DATE }}" \
+            --json number,title,author,url \
+            --template '{{range .}}* {{.title}} (#{{.number}}) by @{{.author.login}}\n{{end}}')
+
+          # Use special syntax to escape for multiline output
+          echo "summary<<EOF" >> $GITHUB_OUTPUT
+          echo "$prs" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Print Summary to Log
+        run: |
+          echo "Weekly Summary for ${{ env.UPSTREAM_REPO }}"
+          echo "------------------------------------------------"
+          echo "${{ steps.fetch_prs.outputs.summary }}"
