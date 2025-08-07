@@ -1,41 +1,35 @@
-# .github/workflows/weekly-summary.yml
-name: Generate Weekly Upstream Summary
+name: Sync and Create Weekly Release for Original Repo
 
 on:
-  # Run this workflow manually from the Actions tab
-  workflow_dispatch:
-  # Or, run it on a schedule (e.g., every Friday at 23:00 UTC)
   schedule:
-    - cron: '0 2 * * 5'
+    - cron: '0 0 * * 5'  # Runs every Thursday at midnight
 
 jobs:
-  generate-summary:
+  sync-and-release:
     runs-on: ubuntu-latest
     steps:
-      - name: Get date for 7 days ago
-        id: get_date
-        run: echo "PAST_DATE=$(date -d '7 days ago' +%Y-%m-%d)" >> $GITHUB_ENV
+      - name: Checkout forked repo
+        uses: actions/checkout@v3
+        with:
+          repository: aaarkai/vllm_sail
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Fetch Merged PRs from Upstream Repo
-        id: fetch_prs
+      - name: Sync with original repo
+        run: |
+          git remote add original https://github.com/vllm-project/vllm.git
+          git fetch original
+          git merge original/main
+
+      - name: Get current date
+        id: get-date
+        run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+
+      - name: Create release for original repo
+        uses: softprops/action-gh-release@v1
+        with:
+          repository: aaarkai/vllm_sail
+          tag_name: weekly-${{ steps.get-date.outputs.date }}
+          name: Weekly Release ${{ steps.get-date.outputs.date }}
+          generate_release_notes: true
         env:
-          # This token is required to make API requests
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # !!! CHANGE THIS to the repository you want to track !!!
-          UPSTREAM_REPO: "vllm-project/vllm"
-        run: |
-          prs=$(gh pr list --repo $UPSTREAM_REPO --limit 500 \
-            --search "is:pr is:merged merged:>${{ env.PAST_DATE }}" \
-            --json number,title,author,url \
-            --template '{{range .}}* {{.title}} (#{{.number}}) by @{{.author.login}}\n{{end}}')
-
-          # Use special syntax to escape for multiline output
-          echo "summary<<EOF" >> $GITHUB_OUTPUT
-          echo "$prs" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-
-      - name: Print Summary to Log
-        run: |
-          echo "Weekly Summary for ${{ env.UPSTREAM_REPO }}"
-          echo "------------------------------------------------"
-          echo "${{ steps.fetch_prs.outputs.summary }}"
+          GITHUB_TOKEN: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
