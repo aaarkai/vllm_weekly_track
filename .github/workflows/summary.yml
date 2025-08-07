@@ -1,6 +1,7 @@
 name: Sync and Create Weekly Release for Original Repo
 
 on:
+  workflow_dispatch:
   schedule:
     - cron: '0 0 * * 5'  # Runs every Thursday at midnight
 
