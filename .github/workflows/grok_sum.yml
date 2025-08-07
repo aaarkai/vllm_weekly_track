@@ -12,10 +12,11 @@ jobs:
       - name: Generate PR Summary
         uses: actions/github-script@v6
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const core = require('@actions/core');
-            const github = require('@actions/github');
-            const originalRepo = core.getInput('original_repo');
+            const { Octokit } = require('@octokit/rest');
+            const github = new Octokit({ auth: process.env.GITHUB_TOKEN });
+            const originalRepo = 'vllm-project/vllm'; // Hardcoded repository
             const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
             const response = await github.rest.search.issuesAndPullRequests({
@@ -24,7 +25,6 @@ jobs:
             });
 
             const prs = response.data.items;
-
             let summary = "## Merged PRs in the Last Week\n\n";
 
             if (prs.length === 0) {
@@ -36,9 +36,8 @@ jobs:
             }
 
             await github.rest.issues.create({
-              owner: github.context.repo.owner,
-              repo: github.context.repo.repo,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
               title: `Weekly PR Summary - ${new Date().toISOString().split('T')[0]}`,
               body: summary,
             });
-          original_repo: 'vllm-project/vllm'  # Replace with the actual repository
