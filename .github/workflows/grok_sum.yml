@@ -1,0 +1,43 @@
+name: Weekly PR Summary
+
+on:
+  schedule:
+    - cron: '0 0 * * 4'  # Every Thursday at midnight
+
+jobs:
+  generate-summary:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate PR Summary
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const core = require('@actions/core');
+            const github = require('@actions/github');
+            const originalRepo = core.getInput('original_repo');
+            const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+            const response = await github.rest.search.issuesAndPullRequests({
+              q: `is:pr is:merged repo:${originalRepo} merged:>${sevenDaysAgo}`,
+              per_page: 100,
+            });
+
+            const prs = response.data.items;
+
+            let summary = "## Merged PRs in the Last Week\n\n";
+
+            if (prs.length === 0) {
+              summary += "No PRs were merged in the last week.\n";
+            } else {
+              prs.forEach(pr => {
+                summary += `- [#${pr.number}](${pr.html_url}): ${pr.title} by @${pr.user.login}\n`;
+              });
+            }
+
+            await github.rest.issues.create({
+              owner: github.context.repo.owner,
+              repo: github.context.repo.repo,
+              title: `Weekly PR Summary - ${new Date().toISOString().split('T')[0]}`,
+              body: summary,
+            });
+          original_repo: 'vllm-project/vllm'  # Replace with the actual repository
