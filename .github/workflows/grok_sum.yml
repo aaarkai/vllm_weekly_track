@@ -1,6 +1,7 @@
 name: Weekly PR Summary
 
 on:
+  workflow_dispatch:
   schedule:
     - cron: '0 0 * * 4'  # Every Thursday at midnight
 
