@@ -1,79 +1,52 @@
 # .github/workflows/weekly-summary.yml
-name: Generate AI Release Summary
+name: Generate Upstream Release Summary
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 23 * * 5'
+    - cron: '0 2 * * 5' # Runs every Friday at 23:00 UTC
 
 jobs:
-  create-ai-summary:
+  create-summary-file:
     runs-on: ubuntu-latest
+
     permissions:
       contents: write
+      
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
 
       - name: Set up file path
-        run: echo "filepath=summaries/ai-weekly-$(date +'%Y-%m-%d').md" >> $GITHUB_ENV
+        id: file_details
+        run: echo "filepath=summaries/weekly-$(date +'%Y-%m-%d').md" >> $GITHUB_ENV
 
-      - name: Fetch Raw PR List
-        id: fetch_prs
+      # MODIFIED STEP: This now creates the file directly.
+      - name: Fetch PRs and Write to File
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          UPSTREAM_REPO: "vllm-project/vllm"
+          UPSTREAM_REPO: "vllm-project/vllm" # Using the repo from your log as an example
+          TARGET_FILE: ${{ env.filepath }}
         run: |
-          raw_list=$(gh pr list --repo $UPSTREAM_REPO --limit 300 \
-            --search "is:pr is:merged merged:>=$(date -d '7 days ago' +%Y-%m-%d)" \
-            --json title \
-            --template '{{range .}}- {{.title}}
-          {{end}}')
+          # Create the directory if it doesn't exist
+          mkdir -p "$(dirname "$TARGET_FILE")"
           
-          # Use special syntax to preserve multiline output for the next step
-          {
-            echo "pr_list<<EOF"
-            echo "$raw_list"
-            echo "EOF"
-          } >> "$GITHUB_OUTPUT"
+          # Write the header to the new file
+          echo "## Weekly Summary for ${{ env.UPSTREAM_REPO }} ($(date +'%Y-%m-%d'))" > "$TARGET_FILE"
+          echo "" >> "$TARGET_FILE"
+          
+          # Fetch PR list and append it to the file
+          gh pr list --repo $UPSTREAM_REPO --limit 500 \
+            --search "is:pr is:merged merged:>=$(date -d '7 days ago' +%Y-%m-%d)" \
+            --json number,title,author,url \
+            --template '{{range .}}* {{.title}} (#{{.number}}) by @{{.author.login}}
+          {{end}}' >> "$TARGET_FILE"
 
-      - name: Generate Release Notes with Gemini AI
-        id: gemini
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const pr_list = `${{ steps.fetch_prs.outputs.pr_list }}`;
-            const prompt = `
-            As a technical writer for the vllm-project/vllm open-source project, your task is to create weekly release notes.
-
-            Here is the list of pull requests merged in the last week:
-            ${pr_list}
-
-            Please perform the following actions:
-            1. Write a brief, engaging introductory paragraph summarizing the week's key developments.
-            2. Group the pull requests into logical categories like "🚀 New Features", "🐛 Bug Fixes", "⚡ Performance Improvements", and "🧹 Maintenance".
-            3. Rewrite each PR title into a user-friendly, descriptive sentence, and use Chinese first.
-            4. Format the entire output as clean Markdown.
-            `;
-
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${process.env.GEMINI_API_KEY}`;
-            const response = await fetch(url, {
-              method: 'POST',
-              headers: {'Content-Type': 'application/json'},
-              body: JSON.stringify({
-                contents: [{parts: [{text: prompt}]}]
-              })
-            });
-            const data = await response.json();
-            const summary = data.candidates[0].content.parts[0].text;
-            core.setOutput('summary', summary);
-        env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-
-      - name: Commit AI-Generated Summary
+      # MODIFIED STEP: This now only needs to find the file, not create it.
+      - name: Commit summary file
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "docs: Add AI-generated weekly summary"
+          commit_message: "docs: Add weekly summary for ${{ env.filepath }}"
           file_pattern: ${{ env.filepath }}
-          commit_user_name: "AI Release Bot"
-          file_content: ${{ steps.gemini.outputs.summary }}
+          commit_user_name: "Weekly Summary Bot"
+          commit_user_email: "actions@github.com"
