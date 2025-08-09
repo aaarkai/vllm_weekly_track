@@ -210,7 +210,8 @@ jobs:
             --jq 'map(.author.login) | unique | map("@\(.)") | join(", ")' >> "$TARGET_FILE"
 
           # Clean up temporary files
-          rm -f "$FEATURES_FILE" "$BUGS_FILE" "$PERF_FILE" "$DOCS_FILE" "$OTHER_FILE" /tmp/all_prs.txt
+          # Clean up temporary files
+          rm -f "$FEATURES_FILE" "$BUGS_FILE" "$PERF_FILE" "$DOCS_FILE" "$REFACTOR_FILE" "$BUILD_FILE" "$HARDWARE_FILE" "$MODEL_FILE" "$MISC_FILE" /tmp/all_prs.txt
 
       # MODIFIED STEP: This now only needs to find the file, not create it.
       - name: Commit summary file
