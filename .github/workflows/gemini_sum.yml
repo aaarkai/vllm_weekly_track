@@ -1,222 +1,47 @@
 # .github/workflows/weekly-summary.yml
-name: Generate Upstream Release Summary
+name: Generate Upstream Weekly Summary
 
 on:
+  # Allow manual triggering of the workflow.
   workflow_dispatch:
+
+  # Schedule to run every Friday at 23:00 UTC.
   schedule:
-    - cron: "0 2 * * 5" # Runs every Friday at 23:00 UTC
+    - cron: "0 2 * * 5"
 
 jobs:
-  create-summary-file:
+  create-summary:
     runs-on: ubuntu-latest
-
     permissions:
+      # Required to push a commit to the repository.
       contents: write
 
     steps:
-      - name: Checkout repo
+      - name: 1. Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up file path
+      - name: 2. Set file path for summary
         id: file_details
         run: echo "filepath=summaries/weekly-$(date +'%Y-%m-%d').md" >> $GITHUB_ENV
 
-      # MODIFIED STEP: This now creates the file directly.
-      - name: Fetch PRs and Write to File
+      - name: 3. Generate weekly summary
         env:
+          # Use the GITHUB_TOKEN provided by the runner.
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          UPSTREAM_REPO: "vllm-project/vllm" # Using the repo from your log as an example
+          # The repository from which to fetch PRs.
+          UPSTREAM_REPO: "vllm-project/vllm"
+          # The target file path for the generated summary.
           TARGET_FILE: ${{ env.filepath }}
         run: |
-          # Create the directory if it doesn't exist
-          mkdir -p "$(dirname "$TARGET_FILE")"
+          # Make the script executable
+          chmod +x .github/scripts/generate-summary.sh
+          # Run the script
+          .github/scripts/generate-summary.sh
 
-          # Write the header to the new file
-          echo "# Weekly Release Notes for ${{ env.UPSTREAM_REPO }} ($(date +'%Y-%m-%d'))" > "$TARGET_FILE"
-          echo "" >> "$TARGET_FILE"
-
-          # Fetch all merged PRs in the last 7 days
-          echo "## What's Changed" >> "$TARGET_FILE"
-          echo "" >> "$TARGET_FILE"
-
-          # Create temporary files for each category
-          FEATURES_FILE=$(mktemp)
-          BUGS_FILE=$(mktemp)
-          PERF_FILE=$(mktemp)
-          DOCS_FILE=$(mktemp)
-          REFACTOR_FILE=$(mktemp)
-          BUILD_FILE=$(mktemp)
-          HARDWARE_FILE=$(mktemp)
-          MODEL_FILE=$(mktemp)
-          MISC_FILE=$(mktemp)
-
-          # Fetch all PRs
-          gh pr list --repo $UPSTREAM_REPO --limit 500 \
-            --search "is:pr is:merged merged:>=$(date -d '7 days ago' +%Y-%m-%d)" \
-            --json number,title,author,url \
-            --template '{{range .}}* {{.title}} ([#{{.number}}]({{.url}})) by @{{.author.login}}
-            {{end}}' > /tmp/all_prs.txt
-
-          # Check if we got any PRs
-          if [ ! -s /tmp/all_prs.txt ]; then
-              echo "* No PRs found for this week" >> "$TARGET_FILE"
-          else
-            shopt -s nocasematch
-            # Read each line and categorize based on title prefixes
-            while IFS= read -r line; do
-              # Extract title from the line (remove the PR number, URL, and author part)
-              # Format is: * Title (#number) by @author
-              title=$(echo "$line" | sed -E 's/ \(\#.*$//' | sed 's/^[*] //')
-
-              case "$title" in
-                      # 1. 优先匹配最明确的标签
-                      "[Bugfix]"* | "[Bug]"* | "[fix]"* )
-                          echo "$line" >> "$BUGS_FILE" ;;
-                      "[FEAT]"* | "[Feature]"* )
-                          echo "$line" >> "$FEATURES_FILE" ;;
-                      "[PERF]"* | "[Performance]"* )
-                          echo "$line" >> "$PERF_FILE" ;;
-                      "[Doc]"* | "[Docs]"* )
-                          echo "$line" >> "$DOCS_FILE" ;;
-                      "[CI]"* | "[Build]"* | "[CI/Build]"* | "[Test]"* )
-                          echo "$line" >> "$BUILD_FILE" ;;
-                      "[Core]"* | "[Refactor]"* | "[Frontend]"* | "[Responses API]"* | "[Sampler]"* | "[Kernel]"* )
-                          echo "$line" >> "$REFACTOR_FILE" ;;
-                      "[ROCm]"* | "[TPU]"* | "[XPU]"* | "[NVIDIA]"* | "[CUDA]*" )
-                          echo "$line" >> "$HARDWARE_FILE" ;;
-                      "[Model]"* | "[gpt-oss]"* | "qwen"* | "glm"* | "llama"* | "mamba"* )
-                          echo "$line" >> "$MODEL_FILE" ;;
-                      "[Misc]"* )
-                          echo "$line" >> "$MISC_FILE" ;;
-
-                      # 2. 如果没有明确标签，则匹配关键词
-                      "fix:"* | "fix "* )
-                          echo "$line" >> "$BUGS_FILE" ;;
-                      "feat:"* | "add "* | "support "* | "enable "* )
-                          echo "$line" >> "$FEATURES_FILE" ;;
-                      "optimize"* | "speed up"* | "accelerate"* )
-                          echo "$line" >> "$PERF_FILE" ;;
-                      "doc:"* | "docs:"* | "documentation"* )
-                          echo "$line" >> "$DOCS_FILE" ;;
-                      "refactor"* | "simplify"* | "remove "* | "cleanup"* )
-                          echo "$line" >> "$REFACTOR_FILE" ;;
-                      "update dependency"* | "update transformers"* | "update flashinfer"* )
-                          echo "$line" >> "$BUILD_FILE" ;;
-
-                      # 3. 最后的归宿
-                      * )
-                          echo "$line" >> "$MISC_FILE" ;;
-              esac
-            done < /tmp/all_prs.txt
-            shopt -u nocasematch
-            echo "PRs have been categorized!"
-
-            # Features section
-            echo "### ✨ Features & Enhancements" >> "$TARGET_FILE"
-            echo "" >> "$TARGET_FILE"
-            if [ -s "$FEATURES_FILE" ]; then
-                cat "$FEATURES_FILE" >> "$TARGET_FILE"
-            else
-                echo "* No new features this week." >> "$TARGET_FILE"
-            fi
-            echo "" >> "$TARGET_FILE"
-
-            # Bug Fixes section
-            echo "### 🐛 Bug Fixes" >> "$TARGET_FILE"
-            echo "" >> "$TARGET_FILE"
-            if [ -s "$BUGS_FILE" ]; then
-                cat "$BUGS_FILE" >> "$TARGET_FILE"
-            else
-                echo "* No bug fixes this week." >> "$TARGET_FILE"
-            fi
-            echo "" >> "$TARGET_FILE"
-
-            # Performance Improvements section
-            echo "### ⚡️ Performance" >> "$TARGET_FILE"
-            echo "" >> "$TARGET_FILE"
-            if [ -s "$PERF_FILE" ]; then
-                cat "$PERF_FILE" >> "$TARGET_FILE"
-            else
-                echo "* No performance improvements this week." >> "$TARGET_FILE"
-            fi
-            echo "" >> "$TARGET_FILE"
-
-            # Model Support section
-            echo "### 🤖 Model Support" >> "$TARGET_FILE"
-            echo "" >> "$TARGET_FILE"
-            if [ -s "$MODEL_FILE" ]; then
-                cat "$MODEL_FILE" >> "$TARGET_FILE"
-            else
-                echo "* No new model support updates this week." >> "$TARGET_FILE"
-            fi
-            echo "" >> "$TARGET_FILE"
-
-            # Hardware & Backend Support section
-            echo "### 🔌 Hardware & Backend" >> "$TARGET_FILE"
-            echo "" >> "$TARGET_FILE"
-            if [ -s "$HARDWARE_FILE" ]; then
-                cat "$HARDWARE_FILE" >> "$TARGET_FILE"
-            else
-                echo "* No hardware/backend updates this week." >> "$TARGET_FILE"
-            fi
-            echo "" >> "$TARGET_FILE"
-
-            # Refactoring & Core Improvements section
-            echo "### ⚙️ Refactoring & Core" >> "$TARGET_FILE"
-            echo "" >> "$TARGET_FILE"
-            if [ -s "$REFACTOR_FILE" ]; then
-                cat "$REFACTOR_FILE" >> "$TARGET_FILE"
-            else
-                echo "* No core refactoring this week." >> "$TARGET_FILE"
-            fi
-            echo "" >> "$TARGET_FILE"
-
-            # Build, CI & Test section
-            echo "### 🔧 Build, CI & Testing" >> "$TARGET_FILE"
-            echo "" >> "$TARGET_FILE"
-            if [ -s "$BUILD_FILE" ]; then
-                cat "$BUILD_FILE" >> "$TARGET_FILE"
-            else
-                echo "* No build, CI, or testing changes this week." >> "$TARGET_FILE"
-            fi
-            echo "" >> "$TARGET_FILE"
-
-            # Documentation section
-            echo "### 📚 Documentation" >> "$TARGET_FILE"
-            echo "" >> "$TARGET_FILE"
-            if [ -s "$DOCS_FILE" ]; then
-                cat "$DOCS_FILE" >> "$TARGET_FILE"
-            else
-                echo "* No documentation updates this week." >> "$TARGET_FILE"
-            fi
-            echo "" >> "$TARGET_FILE"
-
-            # Miscellaneous section
-            echo "### 📦 Miscellaneous" >> "$TARGET_FILE"
-            echo "" >> "$TARGET_FILE"
-            if [ -s "$MISC_FILE" ]; then
-                cat "$MISC_FILE" >> "$TARGET_FILE"
-            else
-                echo "* No miscellaneous changes this week." >> "$TARGET_FILE"
-            fi
-            echo "" >> "$TARGET_FILE"
-
-          # Contributors section
-          echo "## Contributors" >> "$TARGET_FILE"
-          echo "" >> "$TARGET_FILE"
-          gh pr list --repo $UPSTREAM_REPO --limit 500 \
-            --search "is:pr is:merged merged:>=$(date -d '7 days ago' +%Y-%m-%d)" \
-            --json author \
-            --jq 'map(.author.login) | unique | map("@\(.)") | join(", ")' >> "$TARGET_FILE"
-
-          # Clean up temporary files
-          rm -f "$FEATURES_FILE" "$BUGS_FILE" "$PERF_FILE" "$DOCS_FILE" "$OTHER_FILE" /tmp/all_prs.txt
-
-      # MODIFIED STEP: This now only needs to find the file, not create it.
-      - name: Commit summary file
+      - name: 4. Commit summary file
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "docs: Add weekly summary for ${{ env.filepath }}"
           file_pattern: ${{ env.filepath }}
-          commit_user_name: "Weekly Summary Bot"
-          commit_user_email: "actions@github.com"
+          commit_user_name: "GitHub Actions Bot"
+          commit_user_email: "github-actions[bot]@users.noreply.github.com"
