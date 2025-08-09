@@ -57,9 +57,6 @@ jobs:
             --template '{{range .}}* {{.title}} ([#{{.number}}]({{.url}})) by @{{.author.login}}
             {{end}}' > /tmp/all_prs.txt
 
-          echo "debug"
-          cat /tmp/all_prs.txt
-
           # Check if we got any PRs
           if [ ! -s /tmp/all_prs.txt ]; then
               echo "* No PRs found for this week" >> "$TARGET_FILE"
