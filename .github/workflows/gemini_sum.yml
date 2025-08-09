@@ -44,7 +44,11 @@ jobs:
           BUGS_FILE=$(mktemp)
           PERF_FILE=$(mktemp)
           DOCS_FILE=$(mktemp)
-          OTHER_FILE=$(mktemp)
+          REFACTOR_FILE=$(mktemp)
+          BUILD_FILE=$(mktemp)
+          HARDWARE_FILE=$(mktemp)
+          MODEL_FILE=$(mktemp)
+          MISC_FILE=$(mktemp)
 
           # Fetch all PRs
           gh pr list --repo $UPSTREAM_REPO --limit 500 \
@@ -55,41 +59,68 @@ jobs:
 
           echo "debug"
           cat /tmp/all_prs.txt
-          
+
           # Check if we got any PRs
           if [ ! -s /tmp/all_prs.txt ]; then
               echo "* No PRs found for this week" >> "$TARGET_FILE"
           else
+            shopt -s nocasematch
             # Read each line and categorize based on title prefixes
             while IFS= read -r line; do
               # Extract title from the line (remove the PR number, URL, and author part)
               # Format is: * Title (#number) by @author
               title=$(echo "$line" | sed -E 's/ \(\#.*$//' | sed 's/^[*] //')
-              title_lower=$(echo "$title" | tr '[:upper:]' '[:lower:]')
 
-              # Categorize based on title prefixes
-              if [[ "$title_lower" == "feat:"* ]] || [[ "$title_lower" == "feat("* ]] || [[ "$title_lower" == "[feat"* ]] || [[ "$title_lower" == "feature:"* ]] || [[ "$title_lower" == "feature("* ]] || [[ "$title_lower" == "[feature"* ]] || [[ "$title_lower" == "add "* ]] || [[ "$title_lower" == "[add "* ]] || [[ "$title_lower" == "support "* ]] || [[ "$title_lower" == "[support "* ]] || [[ "$title_lower" == *"enable "* ]] || [[ "$title_lower" == *"implement "* ]] || [[ "$title_lower" == *"add:"* ]] || [[ "$title_lower" == *"support:"* ]] || [[ "$title_lower" == *"add "* ]]; then
-                echo "$line" >> "$FEATURES_FILE"
-              elif [[ "$title_lower" == "bug:"* ]] || [[ "$title_lower" == "bug("* ]] || [[ "$title_lower" == "[bug"* ]] || [[ "$title_lower" == "fix:"* ]] || [[ "$title_lower" == "fix("* ]] || [[ "$title_lower" == "[fix"* ]] || [[ "$title_lower" == "bugfix:"* ]] || [[ "$title_lower" == "bugfix("* ]] || [[ "$title_lower" == "[bugfix"* ]] || [[ "$title_lower" == "correct"* ]] || [[ "$title_lower" == "[correct"* ]] || [[ "$title_lower" == *"fix "* ]] || [[ "$title_lower" == *"fix:"* ]] || [[ "$title_lower" == *"bug "* ]] || [[ "$title_lower" == *"fix("* ]]; then
-                echo "$line" >> "$BUGS_FILE"
-              elif [[ "$title_lower" == "perf:"* ]] || [[ "$title_lower" == "perf("* ]] || [[ "$title_lower" == "[perf"* ]] || [[ "$title_lower" == "performance:"* ]] || [[ "$title_lower" == "performance("* ]] || [[ "$title_lower" == "[performance"* ]] || [[ "$title_lower" == "optimize"* ]] || [[ "$title_lower" == "[optimize"* ]] || [[ "$title_lower" == "improve"* ]] || [[ "$title_lower" == "[improve"* ]] || [[ "$title_lower" == *"perf"* ]] || [[ "$title_lower" == *"optimize:"* ]]; then
-                echo "$line" >> "$PERF_FILE"
-              elif [[ "$title_lower" == "doc:"* ]] || [[ "$title_lower" == "doc("* ]] || [[ "$title_lower" == "[doc"* ]] || [[ "$title_lower" == "documentation:"* ]] || [[ "$title_lower" == "documentation("* ]] || [[ "$title_lower" == "[documentation"* ]] || [[ "$title_lower" == "readme:"* ]] || [[ "$title_lower" == "readme("* ]] || [[ "$title_lower" == "[readme"* ]] || [[ "$title_lower" == *"doc "* ]] || [[ "$title_lower" == *"docs:"* ]] || [[ "$title_lower" == *"docs "* ]] || [[ "$title_lower" == *"doc:"* ]]; then
-                echo "$line" >> "$DOCS_FILE"
-              else
-                echo "$line" >> "$OTHER_FILE"
-              fi
+              case "$title" in
+                      # 1. 优先匹配最明确的标签
+                      "[Bugfix]"* | "[Bug]"* | "[fix]"* )
+                          echo "$line" >> "$BUGS_FILE" ;;
+                      "[FEAT]"* | "[Feature]"* )
+                          echo "$line" >> "$FEATURES_FILE" ;;
+                      "[PERF]"* | "[Performance]"* )
+                          echo "$line" >> "$PERF_FILE" ;;
+                      "[Doc]"* | "[Docs]"* )
+                          echo "$line" >> "$DOCS_FILE" ;;
+                      "[CI]"* | "[Build]"* | "[CI/Build]"* | "[Test]"* )
+                          echo "$line" >> "$BUILD_FILE" ;;
+                      "[Core]"* | "[Refactor]"* | "[Frontend]"* | "[Responses API]"* | "[Sampler]"* | "[Kernel]"* )
+                          echo "$line" >> "$REFACTOR_FILE" ;;
+                      "[ROCm]"* | "[TPU]"* | "[XPU]"* | "[NVIDIA]"* | "[CUDA]*" )
+                          echo "$line" >> "$HARDWARE_FILE" ;;
+                      "[Model]"* | "[gpt-oss]"* | "qwen"* | "glm"* | "llama"* | "mamba"* )
+                          echo "$line" >> "$MODEL_FILE" ;;
+                      "[Misc]"* )
+                          echo "$line" >> "$MISC_FILE" ;;
+
+                      # 2. 如果没有明确标签，则匹配关键词
+                      "fix:"* | "fix "* )
+                          echo "$line" >> "$BUGS_FILE" ;;
+                      "feat:"* | "add "* | "support "* | "enable "* )
+                          echo "$line" >> "$FEATURES_FILE" ;;
+                      "optimize"* | "speed up"* | "accelerate"* )
+                          echo "$line" >> "$PERF_FILE" ;;
+                      "doc:"* | "docs:"* | "documentation"* )
+                          echo "$line" >> "$DOCS_FILE" ;;
+                      "refactor"* | "simplify"* | "remove "* | "cleanup"* )
+                          echo "$line" >> "$REFACTOR_FILE" ;;
+                      "update dependency"* | "update transformers"* | "update flashinfer"* )
+                          echo "$line" >> "$BUILD_FILE" ;;
+
+                      # 3. 最后的归宿
+                      * )
+                          echo "$line" >> "$MISC_FILE" ;;
+              esac
             done < /tmp/all_prs.txt
+            shopt -u nocasematch
+            echo "PRs have been categorized!"
 
             # Features section
-            echo "### 🚀 Features & Enhancements" >> "$TARGET_FILE"
+            echo "### ✨ Features & Enhancements" >> "$TARGET_FILE"
             echo "" >> "$TARGET_FILE"
-            echo "debug"
-            cat "$FEATURES_FILE"
             if [ -s "$FEATURES_FILE" ]; then
-              cat "$FEATURES_FILE" >> "$TARGET_FILE"
+                cat "$FEATURES_FILE" >> "$TARGET_FILE"
             else
-              echo "* No features or enhancements found this week" >> "$TARGET_FILE"
+                echo "* No new features this week." >> "$TARGET_FILE"
             fi
             echo "" >> "$TARGET_FILE"
 
@@ -97,19 +128,59 @@ jobs:
             echo "### 🐛 Bug Fixes" >> "$TARGET_FILE"
             echo "" >> "$TARGET_FILE"
             if [ -s "$BUGS_FILE" ]; then
-              cat "$BUGS_FILE" >> "$TARGET_FILE"
+                cat "$BUGS_FILE" >> "$TARGET_FILE"
             else
-              echo "* No bug fixes found this week" >> "$TARGET_FILE"
+                echo "* No bug fixes this week." >> "$TARGET_FILE"
             fi
             echo "" >> "$TARGET_FILE"
 
             # Performance Improvements section
-            echo "### ⚡ Performance Improvements" >> "$TARGET_FILE"
+            echo "### ⚡️ Performance" >> "$TARGET_FILE"
             echo "" >> "$TARGET_FILE"
             if [ -s "$PERF_FILE" ]; then
-              cat "$PERF_FILE" >> "$TARGET_FILE"
+                cat "$PERF_FILE" >> "$TARGET_FILE"
             else
-              echo "* No performance improvements found this week" >> "$TARGET_FILE"
+                echo "* No performance improvements this week." >> "$TARGET_FILE"
+            fi
+            echo "" >> "$TARGET_FILE"
+
+            # Model Support section
+            echo "### 🤖 Model Support" >> "$TARGET_FILE"
+            echo "" >> "$TARGET_FILE"
+            if [ -s "$MODEL_FILE" ]; then
+                cat "$MODEL_FILE" >> "$TARGET_FILE"
+            else
+                echo "* No new model support updates this week." >> "$TARGET_FILE"
+            fi
+            echo "" >> "$TARGET_FILE"
+
+            # Hardware & Backend Support section
+            echo "### 🔌 Hardware & Backend" >> "$TARGET_FILE"
+            echo "" >> "$TARGET_FILE"
+            if [ -s "$HARDWARE_FILE" ]; then
+                cat "$HARDWARE_FILE" >> "$TARGET_FILE"
+            else
+                echo "* No hardware/backend updates this week." >> "$TARGET_FILE"
+            fi
+            echo "" >> "$TARGET_FILE"
+
+            # Refactoring & Core Improvements section
+            echo "### ⚙️ Refactoring & Core" >> "$TARGET_FILE"
+            echo "" >> "$TARGET_FILE"
+            if [ -s "$REFACTOR_FILE" ]; then
+                cat "$REFACTOR_FILE" >> "$TARGET_FILE"
+            else
+                echo "* No core refactoring this week." >> "$TARGET_FILE"
+            fi
+            echo "" >> "$TARGET_FILE"
+
+            # Build, CI & Test section
+            echo "### 🔧 Build, CI & Testing" >> "$TARGET_FILE"
+            echo "" >> "$TARGET_FILE"
+            if [ -s "$BUILD_FILE" ]; then
+                cat "$BUILD_FILE" >> "$TARGET_FILE"
+            else
+                echo "* No build, CI, or testing changes this week." >> "$TARGET_FILE"
             fi
             echo "" >> "$TARGET_FILE"
 
@@ -117,22 +188,21 @@ jobs:
             echo "### 📚 Documentation" >> "$TARGET_FILE"
             echo "" >> "$TARGET_FILE"
             if [ -s "$DOCS_FILE" ]; then
-              cat "$DOCS_FILE" >> "$TARGET_FILE"
+                cat "$DOCS_FILE" >> "$TARGET_FILE"
             else
-              echo "* No documentation updates found this week" >> "$TARGET_FILE"
+                echo "* No documentation updates this week." >> "$TARGET_FILE"
             fi
             echo "" >> "$TARGET_FILE"
 
-            # Other PRs section
-            echo "### 📦 Other Changes" >> "$TARGET_FILE"
+            # Miscellaneous section
+            echo "### 📦 Miscellaneous" >> "$TARGET_FILE"
             echo "" >> "$TARGET_FILE"
-            if [ -s "$OTHER_FILE" ]; then
-              cat "$OTHER_FILE" >> "$TARGET_FILE"
+            if [ -s "$MISC_FILE" ]; then
+                cat "$MISC_FILE" >> "$TARGET_FILE"
             else
-              echo "* No other changes found this week" >> "$TARGET_FILE"
+                echo "* No miscellaneous changes this week." >> "$TARGET_FILE"
             fi
             echo "" >> "$TARGET_FILE"
-          fi
 
           # Contributors section
           echo "## Contributors" >> "$TARGET_FILE"
