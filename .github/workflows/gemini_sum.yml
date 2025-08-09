@@ -4,7 +4,7 @@ name: Generate Upstream Release Summary
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 2 * * 5' # Runs every Friday at 23:00 UTC
+    - cron: "0 2 * * 5" # Runs every Friday at 23:00 UTC
 
 jobs:
   create-summary-file:
@@ -12,7 +12,7 @@ jobs:
 
     permissions:
       contents: write
-      
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -30,29 +30,28 @@ jobs:
         run: |
           # Create the directory if it doesn't exist
           mkdir -p "$(dirname "$TARGET_FILE")"
-          
+
           # Write the header to the new file
           echo "# Weekly Release Notes for ${{ env.UPSTREAM_REPO }} ($(date +'%Y-%m-%d'))" > "$TARGET_FILE"
           echo "" >> "$TARGET_FILE"
-          
+
           # Fetch all merged PRs in the last 7 days
           echo "## What's Changed" >> "$TARGET_FILE"
           echo "" >> "$TARGET_FILE"
-          
+
           # Create temporary files for each category
           FEATURES_FILE=$(mktemp)
           BUGS_FILE=$(mktemp)
           PERF_FILE=$(mktemp)
           DOCS_FILE=$(mktemp)
           OTHER_FILE=$(mktemp)
-          
+
           # Fetch all PRs
           gh pr list --repo $UPSTREAM_REPO --limit 500 \
             --search "is:pr is:merged merged:>=$(date -d '7 days ago' +%Y-%m-%d)" \
             --json number,title,author,url \
-            --template '{{range .}}* {{.title}} ([#{{.number}}]({{.url}})) by @{{.author.login}}{{"
-"}}{{end}}' > /tmp/all_prs.txt
-          
+            --template '{{range .}}* {{.title}} ([#{{.number}}]({{.url}})) by @{{.author.login}}{{""}}{{end}}' > /tmp/all_prs.txt
+
           # Check if we got any PRs
           if [ ! -s /tmp/all_prs.txt ]; then
               echo "* No PRs found for this week" >> "$TARGET_FILE"
@@ -62,7 +61,7 @@ jobs:
               # Extract title from the line (everything before the first '(')
               title=$(echo "$line" | sed -E 's/\(\[#[0-9]+\)\(.*$//' | sed 's/[*] //')
               title_lower=$(echo "$title" | tr '[:upper:]' '[:lower:]')
-              
+
               # Categorize based on title prefixes
               if [[ "$title_lower" == "feat"* ]] || [[ "$title_lower" == "[feat"* ]] || [[ "$title_lower" == "feature"* ]] || [[ "$title_lower" == "[feature"* ]] || [[ "$title_lower" == "add "* ]] || [[ "$title_lower" == "[add "* ]] || [[ "$title_lower" == "support "* ]] || [[ "$title_lower" == "[support "* ]]; then
                 echo "$line" >> "$FEATURES_FILE"
@@ -76,7 +75,7 @@ jobs:
                 echo "$line" >> "$OTHER_FILE"
               fi
             done < /tmp/all_prs.txt
-            
+
             # Features section
             echo "### 🚀 Features & Enhancements" >> "$TARGET_FILE"
             echo "" >> "$TARGET_FILE"
@@ -86,7 +85,7 @@ jobs:
               echo "* No features or enhancements found this week" >> "$TARGET_FILE"
             fi
             echo "" >> "$TARGET_FILE"
-            
+
             # Bug Fixes section
             echo "### 🐛 Bug Fixes" >> "$TARGET_FILE"
             echo "" >> "$TARGET_FILE"
@@ -96,7 +95,7 @@ jobs:
               echo "* No bug fixes found this week" >> "$TARGET_FILE"
             fi
             echo "" >> "$TARGET_FILE"
-            
+
             # Performance Improvements section
             echo "### ⚡ Performance Improvements" >> "$TARGET_FILE"
             echo "" >> "$TARGET_FILE"
@@ -106,7 +105,7 @@ jobs:
               echo "* No performance improvements found this week" >> "$TARGET_FILE"
             fi
             echo "" >> "$TARGET_FILE"
-            
+
             # Documentation section
             echo "### 📚 Documentation" >> "$TARGET_FILE"
             echo "" >> "$TARGET_FILE"
@@ -116,7 +115,7 @@ jobs:
               echo "* No documentation updates found this week" >> "$TARGET_FILE"
             fi
             echo "" >> "$TARGET_FILE"
-            
+
             # Other PRs section
             echo "### 📦 Other Changes" >> "$TARGET_FILE"
             echo "" >> "$TARGET_FILE"
@@ -127,7 +126,7 @@ jobs:
             fi
             echo "" >> "$TARGET_FILE"
           fi
-          
+
           # Contributors section
           echo "## Contributors" >> "$TARGET_FILE"
           echo "" >> "$TARGET_FILE"
@@ -135,7 +134,7 @@ jobs:
             --search "is:pr is:merged merged:>=$(date -d '7 days ago' +%Y-%m-%d)" \
             --json author \
             --jq -r 'map(.author.login) | unique | map("@\(.)") | join(", ")' >> "$TARGET_FILE"
-          
+
           # Clean up temporary files
           rm -f "$FEATURES_FILE" "$BUGS_FILE" "$PERF_FILE" "$DOCS_FILE" "$OTHER_FILE" /tmp/all_prs.txt
 
