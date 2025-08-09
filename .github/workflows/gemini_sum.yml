@@ -7,7 +7,7 @@ on:
 
   # Schedule to run every Friday at 23:00 UTC.
   schedule:
-    - cron: "0 2 * * 5"
+    - cron: "0 23 * * 5"
 
 jobs:
   create-summary:
