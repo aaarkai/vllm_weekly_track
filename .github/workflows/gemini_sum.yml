@@ -133,7 +133,7 @@ jobs:
           gh pr list --repo $UPSTREAM_REPO --limit 500 \
             --search "is:pr is:merged merged:>=$(date -d '7 days ago' +%Y-%m-%d)" \
             --json author \
-            --jq -r 'map(.author.login) | unique | map("@\(.)") | join(", ")' >> "$TARGET_FILE"
+            --jq 'map(.author.login) | unique | map("@\(.)") | join(", ")' >> "$TARGET_FILE"
 
           # Clean up temporary files
           rm -f "$FEATURES_FILE" "$BUGS_FILE" "$PERF_FILE" "$DOCS_FILE" "$OTHER_FILE" /tmp/all_prs.txt
