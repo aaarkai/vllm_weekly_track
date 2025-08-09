@@ -4,7 +4,7 @@ name: Fetch PRs
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 2 * * 5" # Runs every Friday at 23:00 UTC
+    - cron: "0 1 * * 5" # Runs every Friday at 23:00 UTC
 
 jobs:
   create-summary-file:
