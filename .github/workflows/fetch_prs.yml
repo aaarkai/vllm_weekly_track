@@ -1,0 +1,52 @@
+# .github/workflows/fetch_prs.yml
+name: Fetch PRs
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 2 * * 5" # Runs every Friday at 23:00 UTC
+
+jobs:
+  create-summary-file:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up file path
+        id: file_details
+        run: echo "filepath=summaries/weekly-PR-list-$(date +'%Y-%m-%d').md" >> $GITHUB_ENV
+
+      # MODIFIED STEP: This now creates the file directly.
+      - name: Fetch PRs and Write to File
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          UPSTREAM_REPO: "vllm-project/vllm" # Using the repo from your log as an example
+          TARGET_FILE: ${{ env.filepath }}
+        run: |
+          # Create the directory if it doesn't exist
+          mkdir -p "$(dirname "$TARGET_FILE")"
+
+          # Write the header to the new file
+          echo "## Weekly Summary for ${{ env.UPSTREAM_REPO }} ($(date +'%Y-%m-%d'))" > "$TARGET_FILE"
+          echo "" >> "$TARGET_FILE"
+
+          # Fetch PR list and append it to the file
+          gh pr list --repo $UPSTREAM_REPO --limit 500 \
+            --search "is:pr is:merged merged:>=$(date -d '7 days ago' +%Y-%m-%d)" \
+            --json number,title,author,url \
+            --template '{{range .}}* {{.title}} (#{{.number}}) by @{{.author.login}}
+          {{end}}' >> "$TARGET_FILE"
+
+      # MODIFIED STEP: This now only needs to find the file, not create it.
+      - name: Commit summary file
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "docs: Add weekly summary for ${{ env.filepath }}"
+          file_pattern: ${{ env.filepath }}
+          commit_user_name: "Weekly Summary Bot"
+          commit_user_email: "actions@github.com"
