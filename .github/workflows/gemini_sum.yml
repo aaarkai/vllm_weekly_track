@@ -52,6 +52,9 @@ jobs:
             --json number,title,author,url \
             --template '{{range .}}* {{.title}} ([#{{.number}}]({{.url}})) by @{{.author.login}}\n{{end}}' > /tmp/all_prs.txt
 
+          echo "debug"
+          cat /tmp/all_prs.txt
+          
           # Check if we got any PRs
           if [ ! -s /tmp/all_prs.txt ]; then
               echo "* No PRs found for this week" >> "$TARGET_FILE"
@@ -80,6 +83,8 @@ jobs:
             # Features section
             echo "### 🚀 Features & Enhancements" >> "$TARGET_FILE"
             echo "" >> "$TARGET_FILE"
+            echo "debug"
+            cat "$FEATURES_FILE"
             if [ -s "$FEATURES_FILE" ]; then
               cat "$FEATURES_FILE" >> "$TARGET_FILE"
             else
