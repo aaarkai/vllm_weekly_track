@@ -50,7 +50,8 @@ jobs:
           gh pr list --repo $UPSTREAM_REPO --limit 500 \
             --search "is:pr is:merged merged:>=$(date -d '7 days ago' +%Y-%m-%d)" \
             --json number,title,author,url \
-            --template '{{range .}}* {{.title}} ([#{{.number}}]({{.url}})) by @{{.author.login}}\n{{end}}' > /tmp/all_prs.txt
+            --template '{{range .}}* {{.title}} ([#{{.number}}]({{.url}})) by @{{.author.login}}
+            {{end}}' > /tmp/all_prs.txt
 
           echo "debug"
           cat /tmp/all_prs.txt
