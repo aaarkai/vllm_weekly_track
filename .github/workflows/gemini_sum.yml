@@ -58,18 +58,19 @@ jobs:
           else
             # Read each line and categorize based on title prefixes
             while IFS= read -r line; do
-              # Extract title from the line (everything before the first '(')
-              title=$(echo "$line" | sed -E 's/\(\[#[0-9]+\)\(.*$//' | sed 's/[*] //')
+              # Extract title from the line (remove the PR number, URL, and author part)
+              # Format is: * Title (#number) by @author
+              title=$(echo "$line" | sed -E 's/ \(\#.*$//' | sed 's/^[*] //')
               title_lower=$(echo "$title" | tr '[:upper:]' '[:lower:]')
 
               # Categorize based on title prefixes
-              if [[ "$title_lower" == "feat"* ]] || [[ "$title_lower" == "[feat"* ]] || [[ "$title_lower" == "feature"* ]] || [[ "$title_lower" == "[feature"* ]] || [[ "$title_lower" == "add "* ]] || [[ "$title_lower" == "[add "* ]] || [[ "$title_lower" == "support "* ]] || [[ "$title_lower" == "[support "* ]]; then
+              if [[ "$title_lower" == "feat:"* ]] || [[ "$title_lower" == "feat("* ]] || [[ "$title_lower" == "[feat"* ]] || [[ "$title_lower" == "feature:"* ]] || [[ "$title_lower" == "feature("* ]] || [[ "$title_lower" == "[feature"* ]] || [[ "$title_lower" == "add "* ]] || [[ "$title_lower" == "[add "* ]] || [[ "$title_lower" == "support "* ]] || [[ "$title_lower" == "[support "* ]] || [[ "$title_lower" == *"enable "* ]] || [[ "$title_lower" == *"implement "* ]] || [[ "$title_lower" == *"add:"* ]] || [[ "$title_lower" == *"support:"* ]]; then
                 echo "$line" >> "$FEATURES_FILE"
-              elif [[ "$title_lower" == "bug"* ]] || [[ "$title_lower" == "[bug"* ]] || [[ "$title_lower" == "fix"* ]] || [[ "$title_lower" == "[fix"* ]] || [[ "$title_lower" == "bugfix"* ]] || [[ "$title_lower" == "[bugfix"* ]] || [[ "$title_lower" == "correct"* ]] || [[ "$title_lower" == "[correct"* ]]; then
+              elif [[ "$title_lower" == "bug:"* ]] || [[ "$title_lower" == "bug("* ]] || [[ "$title_lower" == "[bug"* ]] || [[ "$title_lower" == "fix:"* ]] || [[ "$title_lower" == "fix("* ]] || [[ "$title_lower" == "[fix"* ]] || [[ "$title_lower" == "bugfix:"* ]] || [[ "$title_lower" == "bugfix("* ]] || [[ "$title_lower" == "[bugfix"* ]] || [[ "$title_lower" == "correct"* ]] || [[ "$title_lower" == "[correct"* ]] || [[ "$title_lower" == *"fix "* ]] || [[ "$title_lower" == *"fix:"* ]] || [[ "$title_lower" == *"bug "* ]]; then
                 echo "$line" >> "$BUGS_FILE"
-              elif [[ "$title_lower" == "perf"* ]] || [[ "$title_lower" == "[perf"* ]] || [[ "$title_lower" == "performance"* ]] || [[ "$title_lower" == "[performance"* ]] || [[ "$title_lower" == "optimize"* ]] || [[ "$title_lower" == "[optimize"* ]] || [[ "$title_lower" == "improve"* ]] || [[ "$title_lower" == "[improve"* ]]; then
+              elif [[ "$title_lower" == "perf:"* ]] || [[ "$title_lower" == "perf("* ]] || [[ "$title_lower" == "[perf"* ]] || [[ "$title_lower" == "performance:"* ]] || [[ "$title_lower" == "performance("* ]] || [[ "$title_lower" == "[performance"* ]] || [[ "$title_lower" == "optimize"* ]] || [[ "$title_lower" == "[optimize"* ]] || [[ "$title_lower" == "improve"* ]] || [[ "$title_lower" == "[improve"* ]] || [[ "$title_lower" == *"perf"* ]]; then
                 echo "$line" >> "$PERF_FILE"
-              elif [[ "$title_lower" == "doc"* ]] || [[ "$title_lower" == "[doc"* ]] || [[ "$title_lower" == "documentation"* ]] || [[ "$title_lower" == "[documentation"* ]] || [[ "$title_lower" == "readme"* ]] || [[ "$title_lower" == "[readme"* ]]; then
+              elif [[ "$title_lower" == "doc:"* ]] || [[ "$title_lower" == "doc("* ]] || [[ "$title_lower" == "[doc"* ]] || [[ "$title_lower" == "documentation:"* ]] || [[ "$title_lower" == "documentation("* ]] || [[ "$title_lower" == "[documentation"* ]] || [[ "$title_lower" == "readme:"* ]] || [[ "$title_lower" == "readme("* ]] || [[ "$title_lower" == "[readme"* ]] || [[ "$title_lower" == *"doc "* ]] || [[ "$title_lower" == *"docs:"* ]] || [[ "$title_lower" == *"docs "* ]]; then
                 echo "$line" >> "$DOCS_FILE"
               else
                 echo "$line" >> "$OTHER_FILE"
