@@ -1,0 +1,46 @@
+name: Generate Formal Weekly Release Report
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "30 23 * * 5" # Fridays 23:30 UTC, after other jobs
+
+jobs:
+  release-report:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set file path
+        run: echo "filepath=summaries/release-$(date +'%Y-%m-%d').md" >> $GITHUB_ENV
+
+      - name: Generate formal release report
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          UPSTREAM_REPO: "vllm-project/vllm"
+          TARGET_FILE: ${{ env.filepath }}
+        run: |
+          chmod +x .github/scripts/generate_release_report.py
+          ./.github/scripts/generate_release_report.py
+
+      - name: Add LLM Executive Summary (optional)
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_MODEL: ${{ vars.OPENAI_MODEL }}
+          OPENAI_API_BASE: ${{ vars.OPENAI_API_BASE }}
+          TARGET_FILE: ${{ env.filepath }}
+        run: |
+          chmod +x .github/scripts/summarize_llm.py
+          ./.github/scripts/summarize_llm.py || true
+
+      - name: Commit release report
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "docs: add formal weekly release report for ${{ env.filepath }}"
+          file_pattern: ${{ env.filepath }}
+          commit_user_name: "Release Report Bot"
+          commit_user_email: "actions@github.com"
