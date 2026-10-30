@@ -1,0 +1,502 @@
+## Weekly Summary for vllm-project/vllm (2026-10-30)
+
+* [Doc] Kimi-K3: move the GB300 AgentX presets to the Oct 26 points with KV-balanced decode (#64665) by @Ankur-singh
+* [CI][ROCm] Check skinny-GEMM guard dispatch without torch.profiler (#64655) by @AndreasKaratzas
+* [CI] Fix mypy errors in test_glm5next.py (#64644) by @aoshen02
+* [CI][Kimi-K3] Add enable_adaptive_verification to the KDA checkpoint test stub (#64619) by @njhill
+* [Bugfix][Frontend] Leave GLM-4.7 array and object tool arguments unpinned (#64615) by @vMaroon
+* [ROCm][CI] Update ROCm AITER nightly staging index (#64610) by @josh-schell-amd
+* [Bugfix][KV Connector][NIXL] Fix Mamba region stride on block-outermost layouts (#64582) by @Dao007forever
+* [CI][MoE] Start every MoE kernel test file from a clean GPU state (#64576) by @khluu
+* [ROCm][Bugfix] Skip AITER tuned GEMM when M*N >= 2^31 on gfx950 (#64567) by @micah-wil
+* [Bugfix][Rust Frontend] Count tool call deltas as generated tokens in vllm-bench openai-responses (#64557) by @dilberx
+* [CI][KV Offload][P2P] Wait for the handshake in the idle peer-hit tests (#64555) by @orozery
+* [Docs] Diff against the merge base in the docs build gate (#64554) by @hmellor
+* [Kernel] Add CUDA routing kernel for Muse Spark Open (#64553) by @jeejeelee
+* [Docs][ROCm] Mistral Large 4 recipe: ROCm image tag, MI355X, TP4 replica launch (#64544) by @hongxiayang
+* [Bugfix][Parser] Parse closed GLM-4.7 tool arguments once while streaming (#64535) by @vMaroon
+* [ROCm][DSv4.1] Lift the skinny-GEMM cap in the gfx942 draft lm_head test (#64532) by @frida-andersson
+* [CI] Bump Transformers version to 5.22.0 (#64529) by @hmellor
+* [Docs] Add Mistral-Large-4-1T-A52B recipe (#64527) by @NickLucche
+* [Model] Support hybrid MegaMoE/TRT-LLM execution for Muse Spark NVFP4 (#64525) by @jeejeelee
+* [Bugfix][Model] Nemotron 3.5 Super VL: support the native transformers config (#64506) by @roikoren755
+* [Security] Enforce request template trust for structured decisions (#64503) by @jperezdealgaba
+* [Bugfix][KV Offload][P2P] Prefill locally while a peer handshake is pending (#64501) by @liranschour
+* [Perf][Qwen3.8] Add SM100 skinny GEMM plans for TP=1 (#64482) by @namgyu-yun
+* [Perf][GLM-5.3] Enable GLM low-latency BF16 GEMM on SM100 (#64481) by @namgyu-yun
+* [Doc] Fix MiniMax-M3 docstring cross-references (#64474) by @freyfwt
+* [MRV2][PP] Fix spec-decode draft/sampled-token broadcast issues (#64458) by @njhill
+* [Perf] Qwen3.5 GDN: overlap in_proj_ba with in_proj_qkvz on the aux stream (#64425) by @gau-nernst
+* [Bugfix][ROCm][DBO] Create hipBLASLt handles in microbatch threads before graph capture (#64423) by @AndreasKaratzas
+* [Perf][GDN] Allocate GDN core output uninitialized, write FlashInfer prefill in place (#64419) by @gau-nernst
+* [Kernel] Update DeepGEMM commit (#64411) by @jeejeelee
+* [Bugfix][KV Offload] Deduplicate in-flight partial-tail loads (#64400) by @waizuichougou
+* [Bugfix][Rust Frontend] Rust vllm-bench accepts --max-concurrency 0 and hangs forever (Python rejects it since #54887) (#64390) by @SIDDARTHAREDDY8
+* [CI] Import the merge-base commit's image cache in PR builds (#64387) by @khluu
+* [ROCm][Quantization] NVFP4 MoE re-quantization and fused shared experts through online quantization (#64378) by @zyongye
+* [CI][ROCm] Drop nvidia-cuda-cccl from the ROCm test lockfile again (#64377) by @AndreasKaratzas
+* [Bugfix] Consume prompt embedding sentinel IDs before model execution (#64367) by @qthequartermasterman
+* [Bugfix] Add chat template fallback for OpenVLA (#64362) by @zohaibm-amd
+* [Spec Decode] Batch-sharded draft logits refactor (#64356) by @TheEpicDolphin
+* [CI] Bump pre-commit hooks (except ruff) (#64349) by @hmellor
+* [CI][Bugfix] Fix flaky port race in test_coordination_store_held_only_by_the_online_dp_master (#64348) by @aarushjain29
+* [Performance][KV Offload] Avoid zero-filling the SimpleCPUOffload host KV pool (#64345) by @SherifWaly
+* [CI] Fix mypy multimodels tests folder (#64342) by @yewentao256
+* [CI] Bump GitHub Actions versions and replace node20 pre-commit/action (#64328) by @hmellor
+* [Doc] DeepSeek-V4-Pro: add MI355X AgentX source profiles (#64322) by @chunfangamd
+* [CI] Enroll Language Models (Standard) in automatic sharding (#64318) by @Thangnguyenvn98
+* [Doc] DeepSeek-V4-Pro: add B200 InferenceX AgentX presets (#64316) by @hshrivastava-droid
+* [CI] Exclude nvidia-cuda-cccl from the ROCm test lockfile (#64302) by @hmellor
+* [Model] Remove Keye-VL and Keye-VL-1.5 (#64287) by @hmellor
+* [Doc] MiniMax-M3.1-Flash: add the GB300 AgentX presets (#64284) by @xinli-sw
+* [Doc] MiniMax-M3.1-Flash: add the GB200 AgentX presets (#64283) by @xinli-sw
+* [Model] Add Nemotron-3.5-Transcribe (#64282) by @DongjiGao
+* [Bugfix][Compile] Fix KV-cache corruption under whole-graph compile (revert #42129) (#64279) by @ericschreiber
+* [CI][Bugfix] Fit the MLA backend bf16 atol to a bf16 SDPA reference (#64259) by @AndreasKaratzas
+* [Bugfix][KV Offload][P2P] Fail a timed-out load at once, defer releasing its slots (#64256) by @liranschour
+* [Bugfix][KV Offload][P2P] Fault a peer whose source WRITE stalls (#64251) by @liranschour
+* [Bugfix][KV Offload][P2P] Retain unconfirmed source WRITEs across session teardown (#64250) by @liranschour
+* [Bugfix][HiSparse] Fix compact KV row regression tests (#64238) by @khluu
+* [KV Connector][NIXL] Select push mode for NixlConnector via transfer_mode (#64230) by @Juntian777
+* [Bugfix][KV Offload] Count bounded-replay SWA allocations in the lazy walk target (#64229) by @Juntian777
+* [XPU][UT] reuse test_phi3v.py::test_models_text on XPU (#64228) by @mayuyuace
+* [Bugfix][Benchmark] Restore --input-len/--output-len/--prefix-len in vllm bench throughput (#64227) by @subhashpolisetti
+* [KV Offload] Update KVCR to v0.2.0 (#64224) by @mkhazraee
+* [KV Connector][Mooncake] Renew prefill KV leases from the decoder (#64193) by @CJJ1008
+* [CI][Bugfix] Pin the ColUltraVBERT test checkpoint to the revision vLLM supports (#64189) by @AndreasKaratzas
+* [Feature][Core] Add opt-in multi-worker CUDA checkpoint sleep (#64186) by @AlanFokCo
+* [Doc] Add autotrust/JEV-27B-VL multimodal recipe (vLLM >= 0.32.0) (#64180) by @yiminghub2024
+* [Bugfix] Omit null `annotations` and `usage.prompt_tokens_details` in chat completions (#64177) by @vadiklyutiy
+* [Doc] Fix long-text embedding example pooler config and GPU pinning (#64170) by @bantianyue
+* [Mistral] Use get_grammar_for_chat_request in MistralParser and require mistral-common 1.13.0 (#64169) by @juliendenize
+* [Bench] Default to Zipf routing for forward benchmarks with dummy weights (#64167) by @WoosukKwon
+* [ROCm][Bugfix][Kimi-K3] Build the folded q_b_proj / W_UK weight on the root model (#64158) by @seungrokj
+* [Spec Decode] Disable batch-sharded draft logits for PCP (#64151) by @TheEpicDolphin
+* [Bugfix][Spec Decode] Don't specialize MRV2 logits-stats kernels on num_logits (#64137) by @ayush1399
+* [CI] Enroll two steps and two AMD mirrors in automatic sharding (#64115) by @Thangnguyenvn98
+* [Doc] MiniMax-M3: GB200 AgentX presets (TP4/TP8) (#64114) by @Ankur-singh
+* [CI/Build] Add nixl auto-label rule and assign topic owners (#64113) by @NickLucche
+* [New Model] Add MiniMax-M3.1-Flash Model and Kernels (#64111) by @zyongye
+* [Doc] MiniMax-M3.1-Flash: add the B300 single-node AgentX presets (#64108) by @Ankur-singh
+* [CI] Fix stale NVFP4 decode test selector on DGX Spark (#64107) by @grYe99
+* [BugFix]/minicpm ocr downsample mode (#64105) by @HwwwwwwwH
+* [ROCm][Perf][DSv4.1] Mono decode at TP8 on MI355X (#64101) by @okorzh-amd
+* [Frontend] Support /v1/completions in run-batch (#64097) by @paolo-perrone
+* [Bugfix][Multimodal] Fix DeepSeek-OCR zero-sum patch guard in _encode… (#64091) by @nrenvo
+* [Misc] Revert "[NIXL] Bump NIXL version to 1.5.1" (#63817) (#64085) by @jh-nv
+* [CI][Test] Adjust TRT-LLM and GDN numerical tolerances for Rubin (#64081) by @johncalesp
+* [EPD] Metadata-only image and video inputs for GLM-5.3-Flash (#64071) by @grYe99
+* [ROCm][Model] Enable ROCm AITER unified attention for MiMo-V2.6 (#64064) by @vllmellm
+* Ship mamba SSU and Helion tuned kernel configs in wheel package_data (#64063) by @tarukumar
+* [CI][XPU] Deselect Mamba deep-sleep case in Intel CI (#64057) by @chaojun-zhang
+* [CI] Bump Transformers version to 5.21.1 (#64049) by @hmellor
+* [Kernel][MiniMax-M3] Enable SM90 split-K in the Triton indexer (#64037) by @hellozmz
+* [Bugfix][Multimodal] Return 400 when local media access is disabled (#64032) by @hemuku90
+* [CI] Remove codeowner for pre-commit allowlists (#64021) by @hmellor
+* [Bugfix][Frontend] fix Anthropic inline-system probe crashing startup (#64020) by @Hritik003
+* [Bugfix][Pooling] Skip weight tying for omitted LM heads (#64019) by @jzakrzew
+* [Bugfix] Parenthesize penalties Triton chained `or` for Ascend backends (#64013) by @drago1234
+* [CI] Re-enable disabled jobs whose installs are already locked (#64010) by @khluu
+* [ROCm][Perf] Reuse compiled FlyDSL host launchers (#64008) by @coderfeli
+* [Bugfix] Forward launch grid to Triton kernel overrides (#63999) by @wangxiyuan
+* [Model][Spec Decode] Refactor #41834 with useful improvements (#63996) by @wtdcode
+* [Bugfix][Kimi-K3] Reserve KDA prefill workspace before profiling (#63989) by @janbernloehr
+* [XPU][CI] Fix test_tp1_fp8_fusions rms_quant_fusion on XPU (#63975) by @Yejing-Lai
+* [CI][CPU] Initialize DFlash test FC after loading weights (#63973) by @amenomori
+* [Rust Frontend] Reject max_tokens above max_model_len like Python (#63964) by @BugenZhao
+* [Rust Frontend] Accept list-form chat templates like Transformers (#63963) by @BugenZhao
+* [Rust Frontend] Export vllm:num_requests_kv_fetch_by_stage like Python (#63962) by @BugenZhao
+* [Rust Frontend] Return 404 for a missing LoRA adapter path like Python (#63961) by @BugenZhao
+* [Rust Frontend] Count gpt-oss reasoning tokens like Python (#63960) by @BugenZhao
+* [Rust Frontend] Export vllm:engine_sleep_state like Python (#63959) by @BugenZhao
+* [Bugfix][KV Offload] Do not offload the partially computed block of a request that finished with an error (#63937) by @sohom-cs
+* [Model] Add JIT warmup for Muse Spark NVFP4 MegaMoE input preparation (#63920) by @jeejeelee
+* [ROCm][Perf] Fuse MXFP8 activation quant into the 1x32 dot_scaled linear for M <= 16 (#63915) by @RuibinCheung
+* [Bugfix][DSv4.1] Keep the specialized decode's FlashInfer paths on newer FlashInfer (#63914) by @yaoyaoding
+* [CI] Enroll 4 steps and 2 AMD mirrors in automatic sharding (#63907) by @Thangnguyenvn98
+* [Frontend] Support thinking_token_budget in the Responses API (#63896) by @Vegetog
+* [CI][XPU] Give test_mrv2_weight_offloading more GPU memory headroom (#63895) by @chaojun-zhang
+* [Bugfix][LoRA] Avoid double rounding in fused MoE expand (#63894) by @chaojun-zhang
+* [Perf][KV Offload] Reduce KVCR adapter overhead (#63889) by @mkhazraee
+* [ROCm][Perf][DSv4.1] Build the SWA decode metadata in one launch  (#63885) by @okorzh-amd
+* [Bugfix][Bench] Handle packed hybrid KV and speculative recurrent state (#63873) by @WoosukKwon
+* [Bugfix][Bench] Support Muse balanced routing (#63872) by @WoosukKwon
+* [Bugfix][Muse] Finalize dummy-loaded MegaMoE weights (#63871) by @WoosukKwon
+* [Docs][Recipe] Align MiniMax-M3 MI355X AgentX monokernel profile (#63868) by @chunfangamd
+* [Perf] Tune the Triton packed GDN decode tile on SM90 (#63864) by @Rockyeast
+* [Recipes Tool] Fix TP auto-detection for heterogeneous per-layer attention models (#63857) by @louie-tsai
+* [Bugfix][Spec Decode] Apply the draft max_model_len limit before model config hooks (#63853) by @Prakash-sa
+* [Doc] Kimi-K3: refresh the GB300 AgentX xPyD preset and add the 3P1D DEP16 preset (#63852) by @Ankur-singh
+* [CI][ROCm] Preflight idle-GPU check in test_pp_cudagraph (#63850) by @divakar-amd
+* [GLM5.3 Perf] Enable dspark fp8 kv cache for draft model, 5.38 GB GPU Memory saved per rank (#63841) by @yewentao256
+* [CI][Frontend] Let the SSL refresher test's fake server accept peer_loads (#63840) by @khluu
+* [Bugfix][ROCm] Wait on per-slot events in packed NCCL consumer (#63833) by @dharak-cohere
+* [ROCm][CI] Release checkpoint page cache between language generation … (#63828) by @djramic
+* [Bugfix][Core] Defer async KV loads on HiSparse decoders until in-flight steps finish (#63827) by @vMaroon
+* [Perf] Use TMA for MOE up/down proj, 3.1~3.4% E2E Throughput Improvement for GLM5.3 (#63820) by @yewentao256
+* [MRV2][Spec Decode] Close DFlash/DSpark and adaptive-verification JIT warmup gaps (#63819) by @mgoin
+* [NIXL] Bump NIXL version to 1.5.1 (#63817) by @jh-nv
+* [Bugfix][ROCm][DSv4.1] Guard NaN scores in gfx942 mono routing (#63816) by @frida-andersson
+* [Frontend][Mistral] Forward response_format to mistral-common chat templating (#63812) by @juliendenize
+* [Bugfix][Attention] FlashInfer sparse MLA: launch at most 65535 tokens per trtllm-gen call  (#63791) by @suiyoubi
+* [Perf][Rust Frontend] Skip detokenization for gRPC requests that read no text (#63789) by @alec-flowers
+* [Bugfix][KV Offload][OBJ] Don't lose a completed transfer when telemetry is unavailable (#63788) by @sungsooha
+* [Perf] Drop BasevLLMParameter's Python `__torch_function__` (#63785) by @NickLucche
+* [KV Offload][P2P] Fail faster: per-mode load timeout, shorter abort-ack and lookup timeouts (#63781) by @liranschour
+* [KV Offload][Tiering] Let a tier fail a promotion and defer releasing its chunks (#63779) by @liranschour
+* [MRV2] Let the runner decide whether to profile CUDA graph memory (#63778) by @njhill
+* [Rust Frontend] Stream kv_transfer_params on the final chunk like Python (#63772) by @BugenZhao
+* [Rust Frontend] Forward profiler_kwargs from /start_profile (#63771) by @BugenZhao
+* [Rust Frontend] Support --enable-log-outputs and --enable-log-deltas (#63769) by @BugenZhao
+* [Rust Frontend] Accept parenthesized and name-only Gemma 4 tool calls like Python (#63768) by @BugenZhao
+* [Rust Frontend] Export request metric series at startup like Python (#63767) by @BugenZhao
+* [Rust Frontend] Serialize unset completions and first-chunk keys as null like Python (#63766) by @BugenZhao
+* [Rust Frontend] Report the engine's VllmConfig in /server_info (#63765) by @BugenZhao
+* [Rust Frontend] Advance streamed completion text_offset by reported tokens (#63764) by @BugenZhao
+* [Rust Frontend] Keep completions top_logprobs and prompt_logprobs in the engine's order like Python (#63763) by @BugenZhao
+* [Rust Frontend] Separate DeepSeek V4 content blocks like deepseek-recipe (#63762) by @BugenZhao
+* [ROCm][CI] Raise MI300 Core Operation Kernels timeout to 90 min (#63760) by @djramic
+* [Bugfix][CPU] Run encoder-only attention bidirectionally in CPU_ATTN (#63738) by @GuSangmo
+* [Bugfix][Perf][ROCm] RDNA launch config for kernel_paged_attention_2d (#63735) by @lijipeng787
+* [Recipe][AMD] Refresh Kimi-K3 PD configurations (#63726) by @YukioZzz
+* [Rust Frontend] Detect Lark grammars like the Python engine (#63709) by @BugenZhao
+* [Bugfix][KV Offload][P2P] Never block in ZmqConnection.send() (#63708) by @liranschour
+* [Bugfix][Rust Frontend] Bump fastokens to 0.3.5 (#63707) by @BugenZhao
+* [Bugfix] Initialize valid ModelOpt NVFP4 MoE dummy scales (#63698) by @WoosukKwon
+* [XPU][UT] Allow HF reference models to load LoRA adapters by adding PEFT to XPU test dependencies (#63694) by @RyanMa29
+* [Bugfix][ROCm][DSv4] Give zero and subnormal mono MXFP8 groups vLLM's scale code (#63689) by @AndreasKaratzas
+* [ROCm][Perf] Make MXFP4 the default indexer K cache dtype for DeepSeek-V4 (#63669) by @shen-shanshan
+* [Doc][ROCm] Update DeepSeek-V4.1-Flash MI355X AgentX scheduling profiles (#63665) by @chunfangamd
+* [Bugfix][KV Offload][P2P] Mark the session dead when its ConnectAck send fails (#63664) by @nilig
+* [Rust Frontend] Update multimodal video frames sampling API (#63661) by @Isotr0py
+* [XPU][CI] Enable test_fusion_rmsnorm_quant on XPU (#63658) by @Yejing-Lai
+* [Doc][ROCm] Update Kimi-K3 MI355X AgentX scheduling cells (#63657) by @chunfangamd
+* [Bugfix][KV Offload][OBJ] Namespace object keys by blocks_per_chunk (#63655) by @Vedant-Agarwal
+* [Bugfix][KV Offload] Do not store sliding-window chunks with null blocks (#63652) by @pepmach
+* [Doc] Update Muse Spark Open  (#63651) by @jeejeelee
+* [Perf][Kimi K3] Opt-in KV-balanced FP8 MLA decode for agentic workloads (#63638) by @wzhao18
+* [ROCm][MiniMax-M3.1] Fuse MXFP8 activation quant into the Gemma input_layernorm for qkv_proj (#63637) by @RuibinCheung
+* [Perf][MRV2] Stage buffer contents by reference and copy straight into UVA (#63633) by @njhill
+* [Bugfix] Fix MOSS-Audio meta initialization (#63629) by @hlin99
+* [Bugfix][KV Offload] Roll back failed P2P NIXL registration (#63628) by @Levius-Fubuki
+* [Benchmark] Include speculative drafting in bench forward (#63622) by @WoosukKwon
+* [Bugfix][KV Offload] Let idle P2P-only engines park (#63618) by @albertoperdomo2
+* [Benchmark] Add steady-state PP support to bench forward (#63616) by @WoosukKwon
+* [Benchmark] Add PCP support to vllm bench forward (#63613) by @WoosukKwon
+* [CI] Disable jobs with unpinned runtime installs (#63609) by @khluu
+* [CI] Disable jobs with unlocked transitive dependencies (#63608) by @khluu
+* [Bugfix][Platform] Keep PIN_MEMORY eager; avoid resolving platform during import vllm (#63601) by @njhill
+* [Bugfix][Frontend] Probe non-jinja renderers for inline system message support (Anthropic API) (#63594) by @robertgshaw2-redhat
+* [Model] Support Ming3-ASR (inclusionAI/Ming-3.0-asr-tiny) (#63585) by @yuanheng-zhao
+* [Bugfix][ROCm][DSv4.1] Await krdy before K2's combine reads klen in index-source launches (#63576) by @AndreasKaratzas
+* [Tool Calling] Migrate llama3_json parser to parser engine (#63569) by @arpera
+* [Bugfix][KV Offload] Pin a shared-prefix junction when a sparse group cuts the offload hit (#63566) by @KaloyanNaumov
+* [Recipe] DeepSeek-V4.1-Flash: AgentX lanes as tuned presets (#63560) by @esmeetu
+* [CI][ROCm] Skip the AITER MoE garbage-rows test for fp8 per-tensor until the AITER fix (#63559) by @AndreasKaratzas
+* [Bugfix][ROCm] Keep the AITER GDN decode fast path off for the DS conv-state layout (#63558) by @AndreasKaratzas
+* [CI][ROCm] Take NIXL PD accuracy side-channel ports from below the ephemeral range (#63557) by @AndreasKaratzas
+* [Spec Decode][Sampling] Batch-sharded draft logits (#63554) by @TheEpicDolphin
+* [Doc] Kimi-K3: InferenceX AgentX lanes as tuned presets; DCP only in presets (#63552) by @esmeetu
+* [Bugfix] Keep MRV2 model state in the runtime pool under sleep mode (#63548) by @xinyuangui2
+* [Perf][MoE] Size the DeepGEMM MegaMoE symmetric buffer for one sequence-parallel shard (#63541) by @mispa-ms
+* [Bugfix][Model] Borrow Gemma4 _get_max_soft_tokens in EmbeddingGemma2 and DiffusionGemma (#63538) by @AndreasKaratzas
+* [CI] Fix the Qwen2 embed memory leak and HfRunner no-cache logprobs (#63537) by @AndreasKaratzas
+* [Doc] MiniMax-M3: InferenceX AgentX lanes as tuned presets (#63534) by @esmeetu
+* [XPU] Fix Kimi-Linear model dispatch (#63531) by @hlin99
+* [XPU] Fix MLA cache op arguments (#63530) by @hlin99
+* [Doc][ROCm] Align Kimi-K3 MI355X AgentX recipe with InferenceX #4393 (#63520) by @chunfangamd
+* [KV Connector] Mooncake store: skip padding in stored KV blocks (#63513) by @wzhao18
+* [Fast Start] Key the weight cache on MoE and linear kernel backends (#63506) by @liusy58
+* [Bugfix][KV Offload][P2P] Exclude rc_gda lanes from the P2P NIXL agent (#63498) by @nilig
+* [LoRA] Reject incompatible MegaMoE backends during config validation (#63496) by @jeejeelee
+* [Pooling] Reduce Clef metadata overhead (#63495) by @taneem-ibrahim
+* [Bugfix][MiniMax-M3] Scope prompt reasoning-end checks to the last message (#63492) by @ehfd
+* [ROCm][MiniMax-M3.1] Move DBO under pure TP and SP prefill to their own PRs (#63490) by @benenzhu
+* [Bugfix][LoRA] Refuse adapters with LoRA on modules vLLM does not wrap (#63489) by @subin9
+* [Bugfix][MRV2] Report the first failed DBO microbatch (#63476) by @algebra-MCX
+* [Bugfix][Kernel] persistent_topk: sync the CTA around radix barrier arrivals (#63475) by @AndreasKaratzas
+* [Kernel] Bump up FlashInfer to 0.7.2.post1 (#63466) by @jeejeelee
+* [CI][Bench] Keep captured request headers case-insensitive in Responses test (#63462) by @khluu
+* [Refactor][RL] Share NCCL trainer rendezvous initialization (#63460) by @Ronald1995
+* [Hardware] Use accelerator APIs in weight transfer (#63457) by @Ronald1995
+* [CI][ROCm] Take MoRIIO P/D test port blocks from below the ephemeral range (#63453) by @AndreasKaratzas
+* [CI] Fix the Domyn Edge (ROCm) and Qwen2 embed HF references (#63452) by @AndreasKaratzas
+* [Bugfix] Release cached cuBLAS workspaces after daemon warmup (#63451) by @tryryry
+* [CI][Kimi-K3] Expect no trailing-block drop in DSpark resend tests (#63449) by @JaredforReal
+* [Bugfix][Spec Decode] DFlash: run the aux hidden state FC in the draft dtype (#63436) by @azaidy
+* [Bugfix][Multimodal] Return 400 for corrupt AVIF and BLP images (#63433) by @vadiklyutiy
+* [Bugfix][MRV2] Skip adaptive verification cost profiling in the CUDA graph memory-profiling pass (#63431) by @LucasWilkinson
+* [Doc][Recipe] MiniMax-M3.1-Flash: DEP2 + DEP4 PD on GB200/GB300, 7-token FLASHINFER_TS DSpark on NVIDIA (#63428) by @zyongye
+* [Bugfix][CUDA Graph] Weak-ref nested outputs of captured graphs (#63427) by @ZJY0516
+* [Deprecation] Deprecate LM Format Enforcer structured outputs backend (#63423) by @WoosukKwon
+* [CI] Add missing `&&` in the Multi-Modal Models (Standard) 3 command (#63422) by @okorzh-amd
+* [Spec Decode] Replace torch.compile'd AV draft-budget selection with a Triton kernel (#63421) by @mgoin
+* [CI] Remove redundant Ubuntu 24.04 release variant (#63413) by @khluu
+* [ROCm][Bugfix][Kimi-K3] Pass zero positions to the fused MLA decode q-prep kernel (#63409) by @seungrokj
+* [CI] List one test path per line in Buildkite pytest commands to avoid merge conflicts (#63408) by @okorzh-amd
+* [Doc] MiniMax-M3: update the B300 NVFP4 InferenceX AgentX profile (#63407) by @hshrivastava-droid
+* [Refactor] Remove dead code models (#63400) by @yewentao256
+* [Doc] MiniMax-M3: document the B300 NVFP4 InferenceX AgentX aggregated profile (#63395) by @Ankur-singh
+* [Doc] MiniMax-M3: use the autotune flag the pinned GB200 nightly accepts, fix golden-AL links (#63394) by @Ankur-singh
+* [Doc] MiniMax-M3: document the H200 MXFP8 InferenceX AgentX aggregated profile (#63391) by @Ankur-singh
+* [Transformers backend] Migrate OLMoE and fix MoE LoRA (#63384) by @hmellor
+* [Bugfix][NVFP4] Fix NaN logits and garbage output from uninitialized fused act+quant scales (#63382) by @nv-nikitaj
+* [Bugfix][MRV2] Keep routed-expert rows of every DBO microbatch (#63372) by @algebra-MCX
+* [vLLM IR] Deprecate ir_op_priority ahead of vLLM IR removal (#63371) by @WoosukKwon
+* [MRV2] Remove stale experimental README (#63370) by @WoosukKwon
+* [Bugfix][Frontend] Apply batch tool_choice rules to streamed tool calls (#63345) by @hickeyma
+* [Doc][ROCm] Document DeepSeek-V4.1-Flash MI355X AgentX TP2 profiles (#63344) by @chunfangamd
+* [ROCm][Perf][Kimi-K3] Use block_m=128 for the fused KDA prefill conv1d (#63342) by @hyukjlee
+* [Bugfix][CPU] Match GPU conv-state layout in GDN spec decode (#63339) by @JaredforReal
+* [ROCm][Recipe] Qwen3.8-Flash-Next: add MI355X Quark MXFP4 variant (TP1/TP2) (#63332) by @mjkvaak-amd
+* [CI][Rust Frontend] Run more Python server tests against the Rust frontend (#63320) by @BugenZhao
+* [Bugfix][LoRA][MoE] Process reloaded weights of LoRA-wrapped MoE layers (#63319) by @aoshen02
+* [Rust Frontend] Support --return-tokens-as-token-ids (#63318) by @BugenZhao
+* [Rust Frontend] Export Mooncake connector transfer metrics like Python (#63317) by @BugenZhao
+* [Rust Frontend] Keep load_inplace off cached LoRA requests like Python (#63316) by @BugenZhao
+* [Rust Frontend] Validate, deduplicate and cap bad words like Python (#63315) by @BugenZhao
+* [Rust Frontend] Render empty tool call arguments as an empty object like Python (#63314) by @BugenZhao
+* [Rust Frontend] Report every invalid logit_bias key like Python (#63313) by @BugenZhao
+* [Bugfix][CPU][CI] Accept assigned nodes in the no-Triton worker test (#63299) by @xaguilar-amd
+* [Bugfix][Rust Frontend] LoraRequest: drop tensorizer_config_dict to match the Python wire layout (#63295) by @aoshen02
+* [Rust Frontend] Group prompt-cache usage and report created_cache_tokens (#63292) by @zylen-det
+* [Bugfix][LoRA] Load the head of SEQ_CLS adapters saved without modules_to_save (#63286) by @subin9
+* [CI][ROCm] Run the online FP8 MoE batch-invariance test on ROCm (#63283) by @AndreasKaratzas
+* [XPU][UT] Use W8A8 FP8 linear kernel instead of W8A16 on XPU in modernbert_fp8 unit test (#63281) by @RyanMa29
+* [Spec Decode] Support trace replay with speculative decoding (#63275) by @aoshen02
+* [UX] Remove `--hf-overrides` necessity for Qwen3-ASR-ForceAligner (#63274) by @Isotr0py
+* [ROCm][MiniMax-M3] Backport #61889: fix sparse PA KV block count (#63270) by @benenzhu
+* [CI][ROCm] Raise the MI355 MiniMax M3 MonoKernel timeout to 45 minutes (#63269) by @AndreasKaratzas
+* [ROCm][Bugfix] Fix Triton paged decode leaving output heads unwritten on gfx942 (#63268) by @AndreasKaratzas
+* [Bugfix][KV Offload] Reject misaligned chunked-local CPU suffix hits (#63266) by @charxwu
+* [Core] Let VLLM_WORKER_SHUTDOWN_TIMEOUT_SECONDS set the EngineCore cleanup grace after an immediate abort (#63260) by @AndreasKaratzas
+* [CI] Trigger recipe previews and the recipes.vllm.ai sync on push (#63259) by @esmeetu
+* [ROCm][Recipe] MiniMax-M3.1-Flash: MI355X PD, DBO / SP prefill, Quark MXFP4, mono decode (#63257) by @benenzhu
+* [RL] Declare weight ownership and layout on ParamMeta (#63256) by @hao-aaron
+* [Kernel] Update DeepGEMM commit (#63253) by @jeejeelee
+* [Spec Decode] Keep drafters within their rotary cache on the V2 model runner (#63251) by @njhill
+* [CI] Label recipe PRs and link their recipes.vllm.ai preview (#63248) by @esmeetu
+* [Doc][Recipe] MiniMax-M3.1-Flash: add Hopper FP8 variant, Docker-only install (#63244) by @esmeetu
+* [CI][ROCm] Fail the AITER nightly overlay on wheels ci_base cannot load (#63242) by @AndreasKaratzas
+* [Refactor][R3] Initialize routed experts capturer before KV cache profiling (#63237) by @Ronald1995
+* [Doc][Recipe] Add MiniMax-M3.1-Flash recipe (#63236) by @esmeetu
+* [Docs] Fix griffe missing-type warnings in XPress kernels (#63228) by @hmellor
+* [Bugfix][KV Events] Prevent replay truncation when the send queue fills (#63224) by @jeffreywang88
+* [Doc] Kimi-K3: document the GB300 disaggregated specialized-decode points in the guide and command builder (#63222) by @Ankur-singh
+* [Bugfix][Spec Decode] Per-request draft retention for structured output under PP (#63219) by @yzong-rh
+* [Bugfix] Default Nemotron Omni mamba_ssm_cache_dtype to float32 (#63218) by @jbottleson-nvidia
+* [Bugfix][KV Offload][P2P] Stop DEALER monitor before closing its reader (#63207) by @vMaroon
+* [CI][Test] Compare bf16 token embeddings by cosine similarity (#63201) by @aarushjain29
+* [Security][CI/Build] Bump uv to 0.13.4 in CI scripts for eMudhra CA distrust (#63191) by @mritunjaysharma394
+* [Bugfix] Skip prompt_embeds passthrough items in set_active_mm_loras (#63190) by @Nan2018
+* [Bugfix][LoRA] Don't reject LoRA for speculative decoding drafters (#63186) by @YaashuDave
+* [ROCm] Fuse tiny-M MXFP8 quant into the block32 GEMM; guard lm_head skinny-GEMM by weight size (#63179) by @alexm-redhat
+* [Docs][Mistral] Note that required and named tool choice may not produce a call (#63178) by @ShyamalShah3
+* [CI][Benchmarks] Fix attention smoke test backend names and failure exit status (#63177) by @johncalesp
+* [Bugfix] shm_broadcast: poll the notify socket from busy readers (#63165) by @ZJY0516
+* [Recipe] MiniMax-M3: add B200 NVFP4 AgentX aggregated profile (#63163) by @hshrivastava-droid
+* [Perf][DSv4.1] Capture the decoder replay graphs on the model graphs' stream (#63155) by @xqoasis
+* [Bugfix][MRV2] Release the warmup memory cached on the capture streams (#63154) by @xqoasis
+* [Frontend] Share non-streaming chat message assembly with batch derender (#63148) by @hickeyma
+* [Test][Pooling] Cover explicit right truncation for the JinaVL score token (#63146) by @cycancode
+* [MM][Mistral] Use real-valued RoPE in the compiled Pixtral ViT (#63145) by @TQCB
+* [KVConnector][Mooncake] Coalesce descending block ids to reduce descriptor number for Mooncake TE (#63142) by @zhou-yuhan
+* [Bugfix][ROCm][Kimi-K3] Validate gfx942's int4 expert requant as int4 (#63131) by @xaguilar-amd
+* [Bugfix][KV Offload] Catch async lookup iterator errors (#63126) by @HaiQiao-Wang
+* [Bugfix] Fix DeepSeek-VL2 cache identity across cropping modes (#63120) by @bzsuni
+* [Bugfix][Kernel] Fix cooperative_topk illegal memory access on NaN scores (#63118) by @LopezCastroRoberto
+* [Bugfix][Pooling] Validate late-interaction mode and use count in the Python API (#63112) by @he-yufeng
+* [Perf][MXFP4] Optimize activation quant for mxfp4. 3x kernel speedup, 5% throughput improvement (#63101) by @ilmarkov
+* [Bugfix][ROCm] Match the DeepSeek-V4.1 FP8 config in the shared-expert FSE compatibility check (#63099) by @BaoYunkai
+* [model] Support MiniCPM-OCR 1.0 (#63095) by @tc-mb
+* [Fast Start] Add daemon-to-daemon warmup cache seeding for Preload (#63088) by @Isotr0py
+* [XPU] temporarily ignore test_cumem.py::test_basic_cumem (#63084) by @yma11
+* [Bugfix][ROCm][MiniMax-M3] Reject IndexCache overrides that miss text_config (#63082) by @lishuoshuo-amd
+* [Bugfix][Multimodal] Respect meta initialization for Engram offload (#63068) by @gty111
+* [Docs][KV Connector] Document standalone Mooncake EGM deployment (#63064) by @neverhook
+* [Perf][DSpark] Stack DeepSeek V41 context WKV projections (#63063) by @chaunceyjiang
+* [Rust Frontend] End prefilled Kimi K3 reasoning at the response opener like Python (#63062) by @BugenZhao
+* [Rust Frontend] Serialize unset chat response fields as null like Python (#63061) by @BugenZhao
+* [Rust Frontend] Reject an empty chat tools array like Python (#63060) by @BugenZhao
+* [Rust Frontend] Accept Gemma 4 tool calls without the call prefix like Python (#63059) by @BugenZhao
+* [Bugfix][ROCm] Use 64-bit row offsets in the Triton W4A16 GEMM (#63054) by @subin9
+* [CI][ROCM][Bug] Elastic DP doesn't work with AITER-on (#63053) by @qli88
+* [Bugfix][DSv4.1] Budget prefill memory the startup profile misses (#63047) by @gcanlin
+* [Kimi K3] KDA RecoverSSM: CuTe verify and commit kernels, records outside the KV cache (#63045) by @wzhao18
+* [MyPy][8/N] Enable strict checking for model test subdirectories (#63042) by @luyixiao95
+* [docs] correct NIXL hybrid SSM heterogeneous TP support (#63036) by @hlin99
+* [ROCm][Kimi-K3] Support MoRIIO consumers with specialized decode (#63031) by @YukioZzz
+* [Perf][DSv4.1] Tile the NVFP4 compressed-KV dequant-gather (#63018) by @nbommi19
+* [Platform] Use pluggable layer for ViT mrope preparation (#63017) by @Isotr0py
+* [BugFix] Forward the configured cpu distributed timeout to `cpu_all_reduce_`  (#63016) by @fangyuchu
+* [Bugfix][KV Offload] Reset the store cursor when a request restarts from token 0 (#63010) by @AdvayMonga
+* [Bugfix][Quantization][Spec Decode] Load ModelOpt mixed-precision DFlash and DSpark drafts (#63001) by @sragrawal
+* [ROCm][Tests] Un-skip AITER MXFP4 padding-matrix and token-padding tests (#62996) by @divakar-amd
+* [ROCm][Kimi-K3] Allow DSpark adaptive verification with DCP on ROCM_AITER_MLA (#62990) by @okorzh-amd
+* [CI][ROCm][MoE] Add AITER_MOE_SORT_BACKEND MXFP4 DSV4 test coverage (#62976) by @divakar-amd
+* [2/N][Bugfix] Make persistent TopK exact on candidate overflow (#62936) by @LopezCastroRoberto
+* [ROCm][CI] Move NFS-affected MI300 test groups to MI355 (#62934) by @djramic
+* [KV Offload] Reject secondary tiers on engines that span nodes (#62930) by @javieratomic
+* [Bugfix][KV Offload] Hold promotions after a cache reset until jobs report (#62929) by @javieratomic
+* [CI][ROCm][MoE] Add MXFP4 SWIGLUOAI_UNINTERLEAVE/SITU test coverage on MI355 (#62907) by @divakar-amd
+* [KV Connector][NIXL] Add a ucx_backend_params key for UCX backend init params (#62905) by @jbelofamd
+* [Doc] Kolibri 1 reasoning and tool-call parsing via HF response template (#62885) by @wsascha
+* [Bugfix] Don't enable MM embedding inputs on KV consumers in language-model-only mode (#62880) by @ChingTsai
+* [Bugfix][CPU] Fix DP NUMA affinity regression (#62867) by @bigPYJ1151
+* [Bugfix][DSA] Reserve the decode indexer logits in the memory profile (#62860) by @gcanlin
+* [Perf][Multimodal] Make encoder cache free linear in items per request (#62850) by @GOavi101
+* [Bugfix][Mamba] Avoid re-marking committed prompt-tail boundaries as cached this step (#62841) by @khyun1109
+* [Security] Refresh vulnerable runtime and test dependencies (#62835) by @jperezdealgaba
+* [ROCm] Bump UCX to v1.23.0-rc1 so NIXL uses rocm_ipc (#62827) by @AndreasKaratzas
+* [Bugfix][LoRA] Reject non-linear expert placement with EP (#62797) by @gc-fu
+* [Bugfix][Spec Decode] Align adaptive draft prefill graph padding (#62796) by @amenomori
+* [Perf][MoE] Add H200 FP8 fused MoE config for Beam-1.0 TP8 (#62763) by @ischencheng
+* [ROCm][Model] Muse Spark: share one RoPE cache sized by max_model_len (#62757) by @okorzh-amd
+* [Bugfix][ROCm] Muse Spark: apply output multiplier and softcap in compute_logits_local (#62756) by @okorzh-amd
+* [Quantization] Honor MoE activation override for Humming MXFP4 (#62751) by @mgoin
+* [Perf][MRV2] Skip idle sampler staged writes (#62748) by @mgoin
+* [Bugfix][HiSparse] Read resident prefill rows by request state slot (#62739) by @MatthewBonanni
+* [Fast Start] Detect weight cache daemon exit in zero-copy engines (#62734) by @liusy58
+* [DeepSeek][ROCm] V4.1-Flash: enable --monokernel on MI325X (#62713) by @frida-andersson
+* [Perf][MRV2] Parallelize staged writes across 1024-element chunks (#62698) by @Juntian777
+* [XPU][CI] Run prefix-caching tests for GDN, Mamba and pooling models on XPU (#62683) by @faaany
+* [Perf] Watermarking: skip greedy-fallback argmax when no request is greedy (#62654) by @simon-veitner-redhat
+* [Feature][HiSparse] Add a platform backend for device operations (#62592) by @zhenwenqi2024
+* [Bugfix][AuxOutput] Retain routed experts while a KV cache tier holds their blocks (#62591) by @aoshen02
+* [Fast Start] Fix weight cache daemon GPU memory and warm-cache warmup hang (#62583) by @liusy58
+* [Bugfix] Defer MRV2 Triton validation to worker startup (#62576) by @jeffreywang88
+* [Core][Frontend] Process checkpoint lifecycle with HTTP prepare/status/resume (#62570) by @galletas1712
+* [RL] Support per-update source ranks for NCCL weight transfer (#62557) by @giannis2two
+* [Model] Add Domyn Edge support (#62544) by @albertoveneri
+* [CI] Automatically label Reflection Beam model changes (#62540) by @jcotant-inferact
+* [CI] Move L4 Distributed Models and LoRA TP and their AMD mirrors from fixed to automatic shards (#62537) by @Thangnguyenvn98
+* [MoE][Model] Gemma 4: skip CUDA-graph padding rows in the routing kernel (#62525) by @Blaze-DSP
+* [CI] Shard Humming B200/H100 evals and two entrypoints AMD mirrors automatically (#62513) by @Thangnguyenvn98
+* [Docs] Add vllm-iluvatar to custom_op.md (#62500) by @rexlee8776
+* [Test][Multimodal] Add end-to-end CLI test for vllm bench mm-processor (#62497) by @nrenvo
+* [ROCm] Monitor FlyDSL JIT compilation after warmup (#62481) by @simondanielsson
+* [Perf][KV Connector][Mooncake] Vectorize transfer descriptor build (#62478) by @CJJ1008
+* [Bugfix][ROCm][MoRIIO] Release every prefill rank a READ holds (#62473) by @tjtanaa
+* [Perf] Avoid redundant tensor operations during serialization (#62464) by @jzakrzew
+* [Rust Frontend] Select one structured outputs backend for every route (#62456) by @BugenZhao
+* [Bugfix][Frontend] Preserve DP rank in Responses requests (#62450) by @jianzs
+* [Bugfix][KV Offload] Refresh CPU LRU for GPU-hit prefixes in eager SimpleCPUOffload (#62444) by @whx-sjtu
+* [Rust Frontend] Add native GLM-5.3 / GLM-5.3-Flash chat rendering (#62424) by @zRzRzRzRzRzRzR
+* [XPU] Enable kernel/sampler unit tests on Intel XPU (#62419) by @pmanczak
+* [Quantization] Keep deleted and renamed params registered after process_weights_after_loading (#62407) by @aoshen02
+* [Feature][PCP] Support decoder-side SWA bounded replay with APC for DeepSeek-V4.1-Flash (#62384) by @wangyicong52
+* [Perf][DSv4.1] Share Engram host tables as host-NUMA cuMem across DP ranks (#62359) by @Juntian777
+* [Bugfix][DCP] Finalize the NIXL DCP interleave size before profiling (#62330) by @NickLucche
+* [Bugfix][Model] Qwen3.8-Flash-Next: load checkpoints with quantized q/k/v and a BF16 QSA indexer (#62318) by @srkim-business
+* [KV Connector][NIXL] Read only a group's own regions in hybrid SSM transfers (#62317) by @NickLucche
+* [Rust Frontend] Add --reasoning-effort-map to rewrite request reasoning efforts (#62312) by @robertgshaw2-redhat
+* [Bugfix][Spec Decode] Preserve DP replica index for standalone draft models (#62301) by @MuonChaser
+* [Bugfix][KV Connector] Report every transfer group as loaded in DecodeBenchConnector (#62242) by @Juntian777
+* [Perf][DSA] Rank the prefill indexer logits with DeepSelect in BF16 (#62240) by @Juntian777
+* [Kernel][Perf] Add H100 tuned configs for Llama-3.1-8B and Qwen3-8B to the batch-invariant matmul table (#62219) by @Monishver11
+* [Model] Add native support for Lfm2BidirectionalModel (#62201) by @Potabk
+* [Frontend] Accept images on /v1/systemone for multimodal next-token models (#62181) by @Vigilans
+* [Perf][Kernel] Size cooperative_topk's single pass by row length, not stride (#62171) by @haosdent
+* [CI][AMD] Mirror ReplaySSM, MiniMax-M3 attention kernels and Kimi K3 prefix cache on MI355 (#62141) by @AndreasKaratzas
+* [Bugfix][Kernel] Fix OAI Triton MXFP4 MoE on SM110 (#62133) by @wtdcode
+* [CI] Move B200 Kernels and MoE Refactor evals from manual to automatic shards (#62120) by @Thangnguyenvn98
+* [GLM 5.3 Perf] Skip scale calculation for `concat_and_cache_mla`, 1.2% ~ 3.0% E2E TPOT improvement (#62102) by @yewentao256
+* [Perf][DSv4.1] Read GPU Engram tables from peers' HBM instead of DP collectives (#62091) by @Juntian777
+* [CI] Move Attention, Quantization and MoE kernel tests and their AMD mirrors from fixed to automatic shards (#62077) by @Thangnguyenvn98
+* [Kernel] Allow registering OOT block-scaled FP8 linear kernels (#62026) by @R3hankhan123
+* [CPU] Add GELU-tanh MoE, FP8 checkpoint support and Gemma-4 INT8 TP=4 padding (#62016) by @bigPYJ1151
+* [Perf] Enable DeepGEMM sparse MQA logits on the FP8 indexer cache, DSv4.1 (#62011) by @LopezCastroRoberto
+* [Perf][EPLB][DSv4] Add a symm_mem weight-migration backend and fuse MegaMoE replica mapping (#62009) by @abmfy
+* [Spec Decode] Support PCP with DSpark for DeepSeek-V4.1 (#61994) by @chaunceyjiang
+* [Bugfix][Core] Keep scheduling running requests after a priority self-preemption (#61976) by @apex-mochen
+* [KV Offload] Load small CPU-tier hits synchronously within the step (#61961) by @kfirtoledo
+* [XPU] bump xpu-kernels to v0.1.16.2 (#61956) by @yma11
+* [ROCm] Revamp CI/release deployment: collapse image tiers, unify build pipeline (#61939) by @AndreasKaratzas
+* [CI] Shard the AMD mirrors of Basic Models (Other) and PCP automatically (#61904) by @Thangnguyenvn98
+* [Perf][Kernel] Add a CuteDSL BF16x3 router GEMM for fp32 router weights on Hopper (#61903) by @ischencheng
+* [Model] Add Muse Spark Open support (#61879) by @jeejeelee
+* [Rust Frontend] Add per-request speculative decoding metrics (#61877) by @xinnywinne
+* [Perf][DeepSeek V4] Declare MXFP8 MoE activations and run them as block FP8 on Hopper (#61875) by @mgoin
+* [ROCm][Perf][Attention] Keep the bf16 attention prefill when FP8 padding would double the heads (#61863) by @lucas-santos-amd
+* [ROCm][Perf] Triton port of the fused GDN MTP decode kernel (#61855) by @iseeyuan
+* [revert] [Build] Fix QuTLASS compilation with PyTorch 2.13 (#61844) by @cleonard530
+* [CI] Shard draft decoding, Qwen eval and scheduling automatically (#61832) by @Thangnguyenvn98
+* [CI] Shard FP8 MoE kernels and L4 Humming eval automatically (#61831) by @Thangnguyenvn98
+* [UMBP][5/10] Add MORI embedded DRAM runtime and transfer handling (#61793) by @charxwu
+* [Test][UMBP][4/10] Cover async lookup, hybrid cache, events, and metrics (#61792) by @charxwu
+* [UMBP][3/10] Add shared lookup, transfer, hybrid, and observability (#61791) by @charxwu
+* [Bugfix][KV Offload] Treat failed secondary-tier stores as back-pressure (#61780) by @YeonghyeonKO
+* [Bugfix][Bench] Aggregate DP running requests for profiling (#61777) by @qianlihuang
+* [Bugfix][Spec Decode] Honor standalone draft load config (#61699) by @ayush1399
+* [MoE] Add locality-domain allocation for FlashInfer CuTeDSL NVFP4 (#61685) by @soodoshll
+* [Bugfix][HiSparse] Pad staged prefill KV to avoid a trtllm-gen out-of-bounds read (#61659) by @MatthewBonanni
+* [Refactor] [AMD] flydsl: Move UltraQuant/TurboQuant decode to public APIs (#61649) by @aditi-amd
+* [Bugfix][LoRA] Fix double pinning of 3D MoE LoRA and EP dummy LoRA sizing (#61636) by @OnePunchMonk
+* [ROCm][MLA][DCP] Drop VLLM_ROCM_AITER_MLA_DCP_VERIFY (#61628) by @xaguilar-amd
+* [Core][Spec Decode] Lookahead block hashes for EAGLE prefix caching (#61589) by @ZJY0516
+* [Bugfix][Spec Decode] Preserve grammar-invalid drafts for rejection sampling (#61557) by @yzong-rh
+* [Bugfix][HiSparse][KV Connector] Fix DecodeBenchConnector crash on bounded KV cache groups (#61543) by @grYe99
+* [ROCm][Qwen4Exp] Enable fp8 KV and indexer caches on the AMD QSA path (#61529) by @mrodden
+* [Kimi-K3] Route the fp8 chunked-context K/V pack through FlashInfer where it has a fused kernel (#61527) by @brandonfzhang
+* [Bugfix][MRV2] Don't count adaptive verification profiling cache as CUDA graph memory (#61509) by @nishantrevur
+* [ROCm][Perf][DSv4] Standalone mono decode layer for DeepSeek-V4-Pro on MI355X (#61482) by @Fangzhou-Ai
+* [MRV2][DBO] Support DBO with speculative decoding and DCP (#61464) by @njhill
+* [Quantization] Enable per-layer fused shared expert selection (#61457) by @fxmarty-amd
+* [Bugfix][KV Offload] Treat an already-published fs block as stored (#61390) by @shreyanshj10
+* [XPU][FP8] Use per-token dynamic FP8 activation quantization (#61362) by @zhenwei-intel
+* [Bugfix] Merge supported KV cache layouts across pipeline stages instead of asserting they match (#61294) by @vadiklyutiy
+* [Model] Support MTP drafts in the Transformers modeling backend (#61270) by @hmellor
+* [Perf][HiSparse] Reduce residency hash probes (#61263) by @Etelis
+* [Feature][Core] Enable best-effort NUMA binding by default (#61258) by @SherifWaly
+* [Bugfix][Rust Frontend] Read the text config under `thinker_config` (#61128) by @GoDiao
+* [Fusion] Fuse Qwen MoE shared MLP activation quantization (#61107) by @Etelis
+* [Frontend] Add --reasoning-effort-map to rewrite request reasoning efforts (#61094) by @robertgshaw2-redhat
+* [Bugfix][KV Offload] Preserve running request prefixes across LRU store batches (#61050) by @ztysth
+* [Bugfix] Keep legacy WNA16 MoE dispatch on Triton under batch invariance (#61038) by @yifanFengg
+* [Bugfix][KV Connector] Serve and store OffloadingConnector partial tails with EAGLE/MTP groups (#61019) by @kimseunghyun-kr
+* [Bugfix] Fuse GLM-5.3 KDA q|k|v convs into one conv1d parameter (#60991) by @JaredforReal
+* [Bugfix][Tool Parser] Keep Step3 parameter values that contain '<' (#60968) by @hpdkhoa
+* [Bugfix] Bound prefix cache reuse by the first requested prompt score (#60960) by @Sunt-ing
+* [Bugfix] Fix Triton prefill attention OutOfResources on GPUs with 99KiB shared memory (#60942) by @vadiklyutiy
+* [Doc] Add k8s-aibom to deployment integrations (#60899) by @glenmessenger
+* [KV Connector][ROCm] MoRIIO: hybrid READ for several attention groups and shared-group speculative methods (#60867) by @MIR-AMD
+* [Bugfix][Rust Frontend] Decode current NIXL connector stats (#60856) by @ilmarkov
+* [ROCm][Perf] Apply opt-in paged MXFP4 sparse indexer dense path for DeepSeek-V4 (#60834) by @shen-shanshan
+* [Bugfix][KV Offload] Reset a resumed streaming session's block table in OffloadingConnector and SimpleCPUOffloadConnector (#60810) by @albertoperdomo2
+* [ROCm][Perf] W4A16: opt-in dense weight cache for RDNA hybrid prefill (#60710) by @zohaibm-amd
+* [Bugfix][Model] Fix Gemma4 encoder CG with `max_soft_tokens` set (#60687) by @cjackal
+* [ROCm][RDNA][Perf] W4A16: packed fp16 prefill dequant and tiles for gfx1151 (#60644) by @stoivonen-amd
+* [Bugfix][DSv4.1] Seed the -1 sentinel in the prefill sparse index workspace (#60613) by @xqoasis
+* [Bugfix][KV Offload] Preserve new loads during same-step resume (#60574) by @Vegetog
+* [Bugfix] Fall back from DeepGEMM and FlashInfer sampling when nvcc is missing (#60514) by @vadiklyutiy
+* [Bugfix][Spec Decode] Keep speculator limits in sync after auto-fit (#60513) by @QHarshil
+* [Bugfix][Qwen4Exp] Reserve QSA indexer prefill workspace during memory profiling (#60490) by @nkuhn-vmw
+* [Bugfix] DSA: all-reduce partial hidden_states before PP send (#60477) by @SumanthRH
+* [KV Offload] Align KVCR cache recency with request prefixes (#60469) by @mkhazraee
+* [Perf][ROCm][Kernel] Add W4A8 int8-dot MXFP4 GEMV for RDNA3/RDNA3.5 d… (#60413) by @xiao-llm
+* [Bugfix] Allow pipeline parallelism for Qwen4Exp PLE models and their MTP drafter (#60234) by @vadiklyutiy
+* [Spec Decode][GLM-5.3-Flash] Support adaptive verification (#60229) by @jonahsamost
+* [Bugfix][Quantization] Fix Humming FP8 linear for per-tensor/per-channel FP8 weights (#60163) by @Manfredss
+* [ROCm][DSv4/4.1] Fuse inverse RoPE and MXFP8 quant into the aiter sparse MLA and sparse MLA gating changes (#60154) by @cagrikymk
+* [Model] Add Dory support (#60149) by @shan18
+* [ROCm][Perf][Kimi-K3] Fold q_b_proj and W_UK into one GEMM for the MLA decode query (#60110) by @nsusanto
+* [Perf][HiSparse] Fuse per-layer slot invalidation and shorten the all-resident resolver path (#60103) by @MatthewBonanni
+* [ROCm][Perf] Restore 32-bit buffer addressing for TRITON_ATTN KV cache views (#60084) by @umarkovi-amd
+* [Bugfix] Fix Qwen3-VL reranker crash on missing tie_word_embeddings in text config (#59989) by @vadiklyutiy
+* [Bugfix][Attention] Keep DSV4.1 sparse prefill out of FULL cudagraphs (#59986) by @he-yufeng
+* [XPU] use multimodal_rotary_embedding xpu kernel for mrope (#59938) by @yma11
+* [KV Connector] Support sleep mode with MooncakeStoreConnector (#59934) by @aoshen02
+* [Bugfix] Preserve fp16 in legacy fused MoE LoRA (#59931) by @sudhanshu112233shukla
+* [Rust Frontend] Refactor rust frontend for latest `llm-multimodal` v1.14 crate (#59854) by @Isotr0py
+* [ROCm] Octave KV (`ROCM_OCTAVE`): native 3-bit KV cache backend for AMD GPUs (#59774) by @JartX
+* [Bugfix][MoE] Remap invalid topk_ids in moe_permute without expert_map (#59717) by @jlqibm
+* [Bugfix][Rust Frontend] Use server-reported prompt_tokens in vllm-bench (#59694) by @ZhenchengLin
+* [ROCm][DSV4.1][Perf] Single-launch DSA decode candidate mask (#59668) by @cpersson-amd
+* [ROCm][Perf] Use AITER FlyDSL INT4 QuickReduce when INT4 QuickReduce is selected (#59478) by @mjkvaak-amd
+* [CPU][Bugfix] Skip KV cache memory reservation for pooling models (#59405) by @Akashcodes732
+* [Bugfix][Attention] Fix FlashInfer MLA DCP decode on ragged spec-decode batches (#59392) by @ZJY0516
+* [Bugfix][Spec Decode] Align MRV2 lm_head LoRA with logits rows (#59341) by @Shr3yash
+* [Perf][KV Offload] Avoid repeated hash-prefix scans (#59322) by @milesial
+* [ROCm] Enable expert parallelism for AITER Triton W4A16 MoE (#59255) by @Rohan138
+* [Bugfix] Preserve FP8 indexer WK pairs across load_weights calls (#59223) by @pllopis
+* [Build] keep CUDA PyTorch wheels aligned with image (#59198) by @AnvitDevadiga
